@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MenuBox</class>
+ <widget class="QWidget" name="MenuBox">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>249</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Modules</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="AddTimeSeries">
+         <property name="text">
+          <string>Add TimeSeries</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="AddEventList">
+         <property name="text">
+          <string>Add EventList</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="AddIntervalList">
+         <property name="text">
+          <string>Add IntervalList</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="DeleteModule">
+         <property name="text">
+          <string>Delete Module</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="O1Plot::ResizingTableView" name="moduleList">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="upButton">
+           <property name="text">
+            <string>Up</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="downButton">
+           <property name="text">
+            <string>Down</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>O1Plot::ResizingTableView</class>
+   <extends>QTableView</extends>
+   <header>ResizingTableView.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
