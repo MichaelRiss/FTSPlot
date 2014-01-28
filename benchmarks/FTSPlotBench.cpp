@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
 
 
 #include <QApplication>
-#include "O1PlotBenchMainWindow.h"
+#include "FTSPlotBenchMainWindow.h"
 
 #ifdef Q_WS_X11
 #include <X11/Xlib.h>
@@ -34,7 +34,7 @@ int main ( int argc, char *argv[] )
     QApplication app ( argc, argv );
 
     // create Mainwindow
-    O1PlotBenchMainWindow win;
+    FTSPlotBenchMainWindow win;
     win.show();
     
     return app.exec();

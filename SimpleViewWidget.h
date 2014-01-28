@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
 #ifndef __SIMPLEVIEWWIDGET_H__
 #define __SIMPLEVIEWWIDGET_H__
 
-namespace O1Plot
+namespace FTSPlot
 {
 
 class SimpleViewWidget;
@@ -51,7 +51,7 @@ class SimpleViewWidget;
 #include "GL_Layer.h"
 #include "SimpleViewModulesModel.h"
 
-namespace O1Plot
+namespace FTSPlot
 {
 
 // add some missing functions (if they are missing)

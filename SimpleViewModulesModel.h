@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
 #ifndef SIMPLEVIEWMODULESMODEL_H
 #define SIMPLEVIEWMODULESMODEL_H
 
-namespace O1Plot
+namespace FTSPlot
 {
     
 class vizModule;
@@ -29,7 +29,7 @@ class SimpleViewWidget;
 
 #include <QAbstractTableModel>
 
-namespace O1Plot
+namespace FTSPlot
 {
 
 class SimpleViewModulesModel : public QAbstractTableModel

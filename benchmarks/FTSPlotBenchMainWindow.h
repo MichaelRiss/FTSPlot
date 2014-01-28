@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -16,25 +16,25 @@
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA */
 
 
-#ifndef O1PLOTBENCHMAINWINDOW_H
-#define O1PLOTBENCHMAINWINDOW_H
+#ifndef FTSPLOTBENCHMAINWINDOW_H
+#define FTSPLOTBENCHMAINWINDOW_H
 
 #include <QMainWindow>
 #include <QTextStream>
 #include <QFile>
-#include "ui_O1PlotBenchMainWindow.h"
+#include "ui_FTSPlotBenchMainWindow.h"
 #include "SimpleViewWidget.h"
 #include "TimeSeriesPlot.h"
 #include "EventEditor.h"
 #include "IntervalEditor.h"
 
-using namespace O1Plot;
+using namespace FTSPlot;
 
-class O1PlotBenchMainWindow : public QMainWindow
+class FTSPlotBenchMainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    O1PlotBenchMainWindow(QWidget* parent = 0, Qt::WindowFlags flags = 0);
+    FTSPlotBenchMainWindow(QWidget* parent = 0, Qt::WindowFlags flags = 0);
 private:
     Ui::MainWindow ui;
     SimpleViewWidget* sView;
@@ -89,5 +89,5 @@ public slots:
     void paintDoneSlot();
 };
 
-#endif // O1PLOTBENCHMAINWINDOW_H
+#endif // FTSPLOTBENCHMAINWINDOW_H
 // kate: indent-mode cstyle; space-indent on; indent-width 0; 

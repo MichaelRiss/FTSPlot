@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -18,10 +18,10 @@
 
 #include <QtGui/QApplication>
 #include <QDebug>
-#include "O1Prep.h"
-#include "O1PrepGUI.h"
+#include "FTSPrep.h"
+#include "FTSPrepGUI.h"
 
-using namespace O1Plot;
+using namespace FTSPlot;
 
 int main(int argc, char** argv)
 {
@@ -30,12 +30,12 @@ int main(int argc, char** argv)
     // parse command line arguments
 /*    if( app.arguments().contains("--help") || app.arguments().contains("-h") )
     {
-      qWarning() << "Usage: O1Prep -th <thinning factor (default 64)> file1 ...";
+      qWarning() << "Usage: FTSPrep -th <thinning factor (default 64)> file1 ...";
       return 0;
     }*/
     
-    O1Prep dth;
-    O1PrepGUI foo;
+    FTSPrep dth;
+    FTSPrepGUI foo;
     foo.setDataProcessor( &dth );
     foo.show();
     return app.exec();

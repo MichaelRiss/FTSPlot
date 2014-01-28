@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
 
 #include "Interval.h"
 
-using namespace O1Plot;
+using namespace FTSPlot;
 
 Interval::Interval()
 {
@@ -63,7 +63,7 @@ bool Interval::operator!= ( const Interval& other ) const
 }
 
 
-QDebug& O1Plot::operator<< ( QDebug& debug, const Interval& b )
+QDebug& FTSPlot::operator<< ( QDebug& debug, const Interval& b )
 {
     debug << b.begin << " " << b.end;
     return debug;

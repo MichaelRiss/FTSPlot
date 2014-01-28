@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -16,8 +16,8 @@
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA */
 
 
-#ifndef O1PREP_H
-#define O1PREP_H
+#ifndef FTSPREP_H
+#define FTSPREP_H
 
 #include <QThread>
 #include <QMutex>
@@ -28,7 +28,7 @@
 #define INFINITY std::numeric_limits<double>::infinity()
 #endif
 
-namespace O1Plot
+namespace FTSPlot
 {
 
 typedef struct {
@@ -36,12 +36,12 @@ typedef struct {
     quint64 ResumePosition;
 } ResumeData;
 
-class O1Prep : public QThread
+class FTSPrep : public QThread
 {
     Q_OBJECT
 public:
-    O1Prep();
-    virtual ~O1Prep();
+    FTSPrep();
+    virtual ~FTSPrep();
 
     bool setNewFile( QString fileName, quint64 thinfactor = 64, quint64 FileSizeLimit = 10485760 );
     bool setresumeFile( QString fileName, quint64 thinfactor, quint64 FileSizeLimit, quint64 level,
@@ -77,5 +77,5 @@ private:
 
 }
 
-#endif // O1PREP_H
+#endif // FTSPREP_H
 // kate: indent-mode cstyle; space-indent on; indent-width 0; 

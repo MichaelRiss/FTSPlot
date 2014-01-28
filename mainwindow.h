@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -20,11 +20,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "ui_O1PlotMainWindow.h"
+#include "ui_FTSPlotMainWindow.h"
 #include "ui_MenuBox.h"
 #include "ColorDialogDelegate.h"
 
-using namespace O1Plot;
+using namespace FTSPlot;
 
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {

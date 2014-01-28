@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
 #include <QDebug>
 #include "ColorDialogDelegate.h"
 
-using namespace O1Plot;
+using namespace FTSPlot;
 
 QWidget* ColorDialogDelegate::createEditor ( QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index ) const
 {

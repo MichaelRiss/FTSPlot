@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -31,7 +31,7 @@
 #include "EventsTest.h"
 #include "IntervalsTest.h"
 
-#include "O1Prep.h"
+#include "FTSPrep.h"
 #ifdef Q_WS_X11
 #include <X11/Xlib.h>
 #endif
@@ -116,7 +116,7 @@ int main( int argc, char** argv )
 
     // "thin" test data
     {
-      O1Prep dataPrep;
+      FTSPrep dataPrep;
       dataPrep.setNewFile( "testData/timeSeriesDataFile.bin" );
       dataPrep.start();
       dataPrep.wait();

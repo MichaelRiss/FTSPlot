@@ -1,4 +1,4 @@
-project(O1Plot)
+project(FTSPlot)
 cmake_minimum_required(VERSION 2.6)
 find_package(Qt4 REQUIRED)
 find_package(OpenGL REQUIRED)
@@ -16,37 +16,37 @@ set( BRANCHFACTOR "4" CACHE STRING "Performancetuning parameter, must be a multi
 set( BENCHREPETITIONS "1000" CACHE STRING "Number of repetitions when doing benchmarks." )
 set( LINUX_DROP_CACHES_VALUE "3" CACHE STRING "Value that should be written into /proc/sys/vm/drop_caches, 1 = only free page cache, 3 = free page cache, directory entries and inodes." )
 
-set(O1PlotLib_SRCS ResizingTableView.cpp HideNotifyWidget.cpp ColorDialogDelegate.cpp Interval.cpp IntervalListLoader.cpp IntervalEditor.cpp 
+set(FTSPlotLib_SRCS ResizingTableView.cpp HideNotifyWidget.cpp ColorDialogDelegate.cpp Interval.cpp IntervalListLoader.cpp IntervalEditor.cpp 
     EventEditorLoader.cpp EventEditor.cpp YScaleBar.cpp SimpleViewWidget.cpp XScaleBar.cpp TimeSeriesPlot.cpp 
     GL_Layer.cpp TimeSeriesPlotLoader.cpp ColorDialogEditor.cpp SimpleViewModulesModel.cpp)
-foreach(item ${O1PlotLib_SRCS})
+foreach(item ${FTSPlotLib_SRCS})
   STRING(REPLACE "cpp" "h" value ${item})
-  set(O1PlotLib_HDRS ${O1PlotLib_HDRS} ${value})
+  set(FTSPlotLib_HDRS ${FTSPlotLib_HDRS} ${value})
 endforeach(item)
 
-set(O1Plot_SRCS O1PlotMain.cpp mainwindow.cpp)
+set(FTSPlot_SRCS FTSPlotMain.cpp mainwindow.cpp)
 
-set(O1PrepLib_SRCS O1Prep.cpp O1PrepGUI.cpp Pow2SpinBox.cpp)
-foreach(item ${O1PrepLib_SRCS})
+set(FTSPrepLib_SRCS FTSPrep.cpp FTSPrepGUI.cpp Pow2SpinBox.cpp)
+foreach(item ${FTSPrepLib_SRCS})
   STRING(REPLACE "cpp" "h" value ${item})
-  set(O1PrepLib_HDRS ${O1PrepLib_HDRS} ${value})
+  set(FTSPrepLib_HDRS ${FTSPrepLib_HDRS} ${value})
 endforeach(item)
-set(O1Prep_SRCS O1PrepMain.cpp)
+set(FTSPrep_SRCS FTSPrepMain.cpp)
 
-set(O1PlotLib_UI_SRCS FileOpenFailed.ui EventEditorGUI.ui IntervalEditorGUI.ui)
-set(O1Plot_UI_SRCS O1PlotMainWindow.ui MenuBox.ui)
+set(FTSPlotLib_UI_SRCS FileOpenFailed.ui EventEditorGUI.ui IntervalEditorGUI.ui)
+set(FTSPlot_UI_SRCS FTSPlotMainWindow.ui MenuBox.ui)
 
-set(O1Prep_UI_SRCS O1PrepGUI.ui)
+set(FTSPrep_UI_SRCS FTSPrepGUI.ui)
 
 
-qt4_wrap_ui(O1PlotLib_UI_HDRS ${O1PlotLib_UI_SRCS})
-qt4_wrap_ui(O1Plot_UI_HDRS ${O1Plot_UI_SRCS})
-qt4_wrap_ui(O1Prep_UI_HDRS ${O1Prep_UI_SRCS})
+qt4_wrap_ui(FTSPlotLib_UI_HDRS ${FTSPlotLib_UI_SRCS})
+qt4_wrap_ui(FTSPlot_UI_HDRS ${FTSPlot_UI_SRCS})
+qt4_wrap_ui(FTSPrep_UI_HDRS ${FTSPrep_UI_SRCS})
 
-qt4_wrap_cpp(O1PlotLib_MOC_SRCS ${O1PlotLib_HDRS})
-qt4_wrap_cpp(O1Plot_MOC_SRCS mainwindow.h)
-qt4_wrap_cpp(O1PrepLib_MOC_SRCS ${O1PrepLib_HDRS})
-qt4_wrap_cpp(O1Prep_MOC_SRCS ${O1Prep_HDRS})
+qt4_wrap_cpp(FTSPlotLib_MOC_SRCS ${FTSPlotLib_HDRS})
+qt4_wrap_cpp(FTSPlot_MOC_SRCS mainwindow.h)
+qt4_wrap_cpp(FTSPrepLib_MOC_SRCS ${FTSPrepLib_HDRS})
+qt4_wrap_cpp(FTSPrep_MOC_SRCS ${FTSPrep_HDRS})
 
 # Set some Win32 Specific Settings
 IF(WIN32)
@@ -57,22 +57,22 @@ IF (APPLE)
 SET(GUI_TYPE MACOSX_BUNDLE)
 ENDIF (APPLE)
 
-add_executable(O1Plot ${GUI_TYPE} ${O1Plot_SRCS} ${O1Plot_MOC_SRCS} ${O1Plot_UI_HDRS})
-add_executable(O1Prep ${GUI_TYPE} ${O1Prep_SRCS} ${O1Prep_MOC_SRCS})
-add_library(O1PlotLib ${O1PlotLib_SRCS} ${O1PlotLib_MOC_SRCS} ${O1PlotLib_UI_HDRS} ${O1PrepLib_SRCS} ${O1PrepLib_MOC_SRCS} ${O1Prep_UI_HDRS})
+add_executable(FTSPlot ${GUI_TYPE} ${FTSPlot_SRCS} ${FTSPlot_MOC_SRCS} ${FTSPlot_UI_HDRS})
+add_executable(FTSPrep ${GUI_TYPE} ${FTSPrep_SRCS} ${FTSPrep_MOC_SRCS})
+add_library(FTSPlotLib ${FTSPlotLib_SRCS} ${FTSPlotLib_MOC_SRCS} ${FTSPlotLib_UI_HDRS} ${FTSPrepLib_SRCS} ${FTSPrepLib_MOC_SRCS} ${FTSPrep_UI_HDRS})
 
-set_target_properties(O1PlotLib PROPERTIES OUTPUT_NAME O1Plot)
+set_target_properties(FTSPlotLib PROPERTIES OUTPUT_NAME FTSPlot)
 set( DEFINES ${DEFINES} BLOCKFACTOR=${BLOCKFACTOR} )
 set( DEFINES ${DEFINES} BRANCHFACTOR=${BRANCHFACTOR} )
 if( COUNT_TILES )
   set( DEFINES ${DEFINES} "COUNT_TILES" )
 endif ( COUNT_TILES )
-set_property(TARGET O1PlotLib PROPERTY COMPILE_DEFINITIONS ${DEFINES})
-set_property(TARGET O1Plot PROPERTY COMPILE_DEFINITIONS ${DEFINES})
+set_property(TARGET FTSPlotLib PROPERTY COMPILE_DEFINITIONS ${DEFINES})
+set_property(TARGET FTSPlot PROPERTY COMPILE_DEFINITIONS ${DEFINES})
 
-target_link_libraries(O1Plot O1PlotLib ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
-target_link_libraries(O1Prep O1PlotLib ${QT_LIBRARIES})
-target_link_libraries(O1PlotLib ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
+target_link_libraries(FTSPlot FTSPlotLib ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
+target_link_libraries(FTSPrep FTSPlotLib ${QT_LIBRARIES})
+target_link_libraries(FTSPlotLib ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
 
 add_subdirectory(tests)
 if( UNIX AND NOT APPLE) # MacOS X does not support clock_gettime()

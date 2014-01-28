@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -20,11 +20,11 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDebug>
-#include "O1PrepGUI.h"
+#include "FTSPrepGUI.h"
 
-using namespace O1Plot;
+using namespace FTSPlot;
 
-O1PrepGUI::O1PrepGUI()
+FTSPrepGUI::FTSPrepGUI()
 {
     ui.setupUi(this);
     state = dth_missing;
@@ -35,7 +35,7 @@ O1PrepGUI::O1PrepGUI()
     updateGUI();
 }
 
-void O1PrepGUI::setDataProcessor(O1Prep* dth)
+void FTSPrepGUI::setDataProcessor(FTSPrep* dth)
 {
     this->dth = dth;
     state = idle_noFile;
@@ -43,7 +43,7 @@ void O1PrepGUI::setDataProcessor(O1Prep* dth)
 }
 
 
-void O1PrepGUI::addFileHandler()
+void FTSPrepGUI::addFileHandler()
 {
     // Spawn filedialog
     QStringList tmp = QFileDialog::getOpenFileNames( this,
@@ -57,7 +57,7 @@ void O1PrepGUI::addFileHandler()
     updateGUI();
 }
 
-void O1PrepGUI::RemoveFileHandler()
+void FTSPrepGUI::RemoveFileHandler()
 {
     // Remove current item in listWidget
     QListWidgetItem* tmp = ui.listWidget->takeItem(ui.listWidget->currentRow());
@@ -69,7 +69,7 @@ void O1PrepGUI::RemoveFileHandler()
     }
 }
 
-void O1PrepGUI::StartStopHandlder()
+void FTSPrepGUI::StartStopHandlder()
 {
     QMessageBox msgBox;
     QFile tmpFile;
@@ -127,7 +127,7 @@ void O1PrepGUI::StartStopHandlder()
         }
         else
         {
-            msgBox.setText("Error: O1Prep object is not ready!");
+            msgBox.setText("Error: FTSPrep object is not ready!");
             msgBox.exec();
         }
 
@@ -143,12 +143,12 @@ void O1PrepGUI::StartStopHandlder()
         break;
 
     default:
-        qDebug("O1PrepGUI::StartStopHandlder(): invalid state!");
+        qDebug("FTSPrepGUI::StartStopHandlder(): invalid state!");
         break;
     }
 }
 
-void O1PrepGUI::ResumeHandler()
+void FTSPrepGUI::ResumeHandler()
 {
     // FileDialog for ResumeFileButton
     QString resumeFileName = QFileDialog::getOpenFileName( this,
@@ -220,7 +220,7 @@ void O1PrepGUI::ResumeHandler()
                               FILESIZELIMIT, level, position ) )
     {
         QMessageBox msgBox;
-        msgBox.setText( "O1Prep is not ready." );
+        msgBox.setText( "FTSPrep is not ready." );
         msgBox.exec();
         return;
     }
@@ -246,7 +246,7 @@ void O1PrepGUI::ResumeHandler()
 }
 
 
-void O1PrepGUI::handleThreadFinish()
+void FTSPrepGUI::handleThreadFinish()
 {
     QMessageBox msgBox;
     //   - cleanup old job
@@ -332,7 +332,7 @@ void O1PrepGUI::handleThreadFinish()
         }
         else
         {
-            msgBox.setText("Error: O1Prep object is not ready!");
+            msgBox.setText("Error: FTSPrep object is not ready!");
             msgBox.exec();
         }
     }
@@ -350,7 +350,7 @@ void O1PrepGUI::handleThreadFinish()
     }
 }
 
-void O1PrepGUI::handleProgressUpdate(int totalProgress, int level, int fileProgress)
+void FTSPrepGUI::handleProgressUpdate(int totalProgress, int level, int fileProgress)
 {
     quint64 tmp = FileIdxAcc + (quint64) ((double) totalProgress * fileFactors[jobFileIdx]);
     ui.totalBar->setValue( tmp );
@@ -359,7 +359,7 @@ void O1PrepGUI::handleProgressUpdate(int totalProgress, int level, int fileProgr
     ui.reductionBar->setValue( fileProgress );
 }
 
-void O1PrepGUI::updateGUI()
+void FTSPrepGUI::updateGUI()
 {
     switch ( state ) {
     case dth_missing:
@@ -418,5 +418,5 @@ void O1PrepGUI::updateGUI()
 }
 
 
-//#include "O1PrepGUI.moc"
+//#include "FTSPrepGUI.moc"
 // kate: indent-mode cstyle; space-indent on; indent-width 0; 

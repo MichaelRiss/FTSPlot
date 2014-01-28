@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@
 #include "DeleteCursorData.xbm"
 
 using namespace std;
-using namespace O1Plot;
+using namespace FTSPlot;
 
 EventEditor::EventEditor ( SimpleViewWidget* plotWidget ) : GL_Layer()
 {
@@ -2313,7 +2313,7 @@ qint64 EventEditor::getXmin()
     }
     else
     {
-        return O1Plot::GL_Layer::getXmin();
+        return FTSPlot::GL_Layer::getXmin();
     }
 }
 
@@ -2326,7 +2326,7 @@ qint64 EventEditor::getXmax()
     }
     else
     {
-        return O1Plot::GL_Layer::getXmax();
+        return FTSPlot::GL_Layer::getXmax();
     }
 }
 

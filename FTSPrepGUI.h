@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -16,25 +16,25 @@
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA */
 
 
-#ifndef O1PREPGUI_H
-#define O1PREPGUI_H
+#ifndef FTSPREPGUI_H
+#define FTSPREPGUI_H
 
 #include <QWidget>
-#include "O1Prep.h"
-#include "ui_O1PrepGUI.h"
+#include "FTSPrep.h"
+#include "ui_FTSPrepGUI.h"
 
 #define FILESIZELIMIT 10485760
 
-namespace O1Plot
+namespace FTSPlot
 {
 
-class O1PrepGUI : public QWidget
+class FTSPrepGUI : public QWidget
 {
     Q_OBJECT
 
 public:
-    O1PrepGUI();
-    void setDataProcessor( O1Prep* dth );
+    FTSPrepGUI();
+    void setDataProcessor( FTSPrep* dth );
 
 public slots:
     void addFileHandler();
@@ -54,7 +54,7 @@ private:
     QVector<quint64> fileIdxs;
     QVector<double> fileFactors;
     int jobFileIdx;
-    O1Prep* dth;
+    FTSPrep* dth;
     Ui::UIWidget ui;
     enum GUIstate {dth_missing, idle_noFile, idle_File, Running};
     GUIstate state;
@@ -63,5 +63,5 @@ private:
 
 }
 
-#endif // O1PREPGUI_H
+#endif // FTSPREPGUI_H
 // kate: indent-mode cstyle; space-indent on; indent-width 0; 

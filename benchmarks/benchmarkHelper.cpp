@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
 
 #include "benchmarkHelper.h"
 
-namespace O1Plot
+namespace FTSPlot
 {
 
 qint64 benchmarkHelper::vertexCount;

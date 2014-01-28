@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
 #ifndef __GL_LAYER_H__
 #define __GL_LAYER_H__
 
-namespace O1Plot
+namespace FTSPlot
 {
 
 class GL_Layer;
@@ -29,7 +29,7 @@ class GL_Layer;
 #include <QMouseEvent>
 #include "SimpleViewWidget.h"
 
-namespace O1Plot
+namespace FTSPlot
 {
 
 class GL_Layer : public QObject

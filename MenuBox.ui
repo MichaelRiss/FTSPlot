@@ -51,7 +51,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="O1Plot::ResizingTableView" name="moduleList">
+        <widget class="FTSPlot::ResizingTableView" name="moduleList">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
            <horstretch>0</horstretch>
@@ -86,7 +86,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>O1Plot::ResizingTableView</class>
+   <class>FTSPlot::ResizingTableView</class>
    <extends>QTableView</extends>
    <header>ResizingTableView.h</header>
   </customwidget>

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>O1Plot</string>
+   <string>FTSPlot</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -29,7 +29,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="O1Plot::YScaleBar" name="MyYScaleBar" native="true">
+         <widget class="FTSPlot::YScaleBar" name="MyYScaleBar" native="true">
           <property name="maximumSize">
            <size>
             <width>100</width>
@@ -42,7 +42,7 @@
          </widget>
         </item>
         <item>
-         <widget class="O1Plot::SimpleViewWidget" name="MySimpleViewWidget" native="true">
+         <widget class="FTSPlot::SimpleViewWidget" name="MySimpleViewWidget" native="true">
           <property name="locale">
            <locale language="English" country="UnitedStates"/>
           </property>
@@ -117,7 +117,7 @@
             </widget>
            </item>
            <item>
-            <widget class="O1Plot::XScaleBar" name="MyXScaleBar" native="true">
+            <widget class="FTSPlot::XScaleBar" name="MyXScaleBar" native="true">
              <property name="maximumSize">
               <size>
                <width>16777215</width>
@@ -139,19 +139,19 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>O1Plot::YScaleBar</class>
+   <class>FTSPlot::YScaleBar</class>
    <extends>QWidget</extends>
    <header>YScaleBar.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>O1Plot::SimpleViewWidget</class>
+   <class>FTSPlot::SimpleViewWidget</class>
    <extends>QWidget</extends>
    <header>SimpleViewWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>O1Plot::XScaleBar</class>
+   <class>FTSPlot::XScaleBar</class>
    <extends>QWidget</extends>
    <header>XScaleBar.h</header>
    <container>1</container>

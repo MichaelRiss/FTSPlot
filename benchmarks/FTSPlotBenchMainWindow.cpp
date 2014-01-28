@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -19,13 +19,13 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QDebug>
-#include "O1PlotBenchMainWindow.h"
+#include "FTSPlotBenchMainWindow.h"
 
 #if defined( COUNT_TILES ) || defined( LINUX_DISABLE_FILESYSTEMCACHE )
 #include "benchmarks/benchmarkHelper.h"
 #endif // COUNT_TILES
 
-O1PlotBenchMainWindow::O1PlotBenchMainWindow ( QWidget* parent, Qt::WindowFlags flags ) : QMainWindow ( parent, flags )
+FTSPlotBenchMainWindow::FTSPlotBenchMainWindow ( QWidget* parent, Qt::WindowFlags flags ) : QMainWindow ( parent, flags )
 {
     ui.setupUi ( this );
     ui.tsStartButton->setDisabled ( true );
@@ -55,7 +55,7 @@ O1PlotBenchMainWindow::O1PlotBenchMainWindow ( QWidget* parent, Qt::WindowFlags 
     connect ( ui.IntervalStartButton, SIGNAL ( clicked ( bool ) ), this, SLOT ( StartIntervalBenchmark() ) );
 }
 
-void O1PlotBenchMainWindow::tsDatasetButtonHandler()
+void FTSPlotBenchMainWindow::tsDatasetButtonHandler()
 {
     // show filedialog
     QString fileName = QFileDialog::getOpenFileName ( NULL, "Select TimeSeries Dataset", "", "TimeSeries Datasets (*.cfg);;All (*)" );
@@ -66,7 +66,7 @@ void O1PlotBenchMainWindow::tsDatasetButtonHandler()
     }
 }
 
-void O1PlotBenchMainWindow::tsOutputButtonHandler()
+void FTSPlotBenchMainWindow::tsOutputButtonHandler()
 {
     // show filedialog
     QString dirName = QFileDialog::getExistingDirectory ( NULL, "Select TimeSeries Logdirectory", "" );
@@ -77,7 +77,7 @@ void O1PlotBenchMainWindow::tsOutputButtonHandler()
     }
 }
 
-void O1PlotBenchMainWindow::EventDatasetButtonHandler()
+void FTSPlotBenchMainWindow::EventDatasetButtonHandler()
 {
     // show directorydialog
     QString dirName = QFileDialog::getExistingDirectory ( NULL, "Select Event Dataset", "" );
@@ -88,7 +88,7 @@ void O1PlotBenchMainWindow::EventDatasetButtonHandler()
     }
 }
 
-void O1PlotBenchMainWindow::EventOutputButtonHandler()
+void FTSPlotBenchMainWindow::EventOutputButtonHandler()
 {
     // show filedialog
     QString dirName = QFileDialog::getExistingDirectory ( NULL, "Select Event Logdirectory", "" );
@@ -100,7 +100,7 @@ void O1PlotBenchMainWindow::EventOutputButtonHandler()
 }
 
 
-void O1PlotBenchMainWindow::IntervalDatasetButtonHandler()
+void FTSPlotBenchMainWindow::IntervalDatasetButtonHandler()
 {
     // show directorydialog
     QString dirName = QFileDialog::getExistingDirectory ( NULL, "Select Interval Dataset", "" );
@@ -111,7 +111,7 @@ void O1PlotBenchMainWindow::IntervalDatasetButtonHandler()
     }
 }
 
-void O1PlotBenchMainWindow::IntervalOutputButtonHandler()
+void FTSPlotBenchMainWindow::IntervalOutputButtonHandler()
 {
     // show filedialog
     QString dirName = QFileDialog::getExistingDirectory ( NULL, "Select Interval Logfile", "" );
@@ -122,7 +122,7 @@ void O1PlotBenchMainWindow::IntervalOutputButtonHandler()
     }
 }
 
-void O1PlotBenchMainWindow::checktsStartButton()
+void FTSPlotBenchMainWindow::checktsStartButton()
 {
     if ( ui.tsDataSetLine->text().size() == 0 || ui.tsOutputLine->text().size() == 0 )
     {
@@ -134,7 +134,7 @@ void O1PlotBenchMainWindow::checktsStartButton()
     }
 }
 
-void O1PlotBenchMainWindow::checkEventStartButton()
+void FTSPlotBenchMainWindow::checkEventStartButton()
 {
     if ( ui.EventDatasetLine->text().size() == 0 || ui.EventOutputLine->text().size() == 0 )
     {
@@ -146,7 +146,7 @@ void O1PlotBenchMainWindow::checkEventStartButton()
     }
 }
 
-void O1PlotBenchMainWindow::checkIntervalStartButton()
+void FTSPlotBenchMainWindow::checkIntervalStartButton()
 {
     if ( ui.IntervalDatasetLine->text().size() == 0 || ui.IntervalOutputLine->text().size() == 0 )
     {
@@ -159,7 +159,7 @@ void O1PlotBenchMainWindow::checkIntervalStartButton()
 }
 
 
-void O1PlotBenchMainWindow::StarttsBenchmark()
+void FTSPlotBenchMainWindow::StarttsBenchmark()
 {
     // disable GUI
     ui.centralwidget->setDisabled ( true );
@@ -235,17 +235,17 @@ void O1PlotBenchMainWindow::StarttsBenchmark()
     sView->displayRange ( 0, currentLength );
 }
 
-void O1PlotBenchMainWindow::handlePaintTime ( qint64 value )
+void FTSPlotBenchMainWindow::handlePaintTime ( qint64 value )
 {
     paintTimeCache = value;
 }
 
-void O1PlotBenchMainWindow::handlePrepTime ( qint64 value )
+void FTSPlotBenchMainWindow::handlePrepTime ( qint64 value )
 {
     displayTimeCache = value;
 }
 
-void O1PlotBenchMainWindow::paintDoneSlot()
+void FTSPlotBenchMainWindow::paintDoneSlot()
 {
     if ( displayListTest == false )
     {
@@ -502,7 +502,7 @@ void O1PlotBenchMainWindow::paintDoneSlot()
 }
 
 
-void O1PlotBenchMainWindow::StartEventBenchmark()
+void FTSPlotBenchMainWindow::StartEventBenchmark()
 {
     // disable GUI
     ui.centralwidget->setDisabled ( true );
@@ -579,7 +579,7 @@ void O1PlotBenchMainWindow::StartEventBenchmark()
     sView->displayRange ( 0, currentLength );
 }
 
-void O1PlotBenchMainWindow::StartIntervalBenchmark()
+void FTSPlotBenchMainWindow::StartIntervalBenchmark()
 {
     // disable GUI
     ui.centralwidget->setDisabled ( true );
@@ -662,7 +662,7 @@ void O1PlotBenchMainWindow::StartIntervalBenchmark()
 }
 
 
-#include "O1PlotBenchMainWindow.moc"
+#include "FTSPlotBenchMainWindow.moc"
 // kate: indent-mode cstyle; space-indent on; indent-width 0; 
 
 

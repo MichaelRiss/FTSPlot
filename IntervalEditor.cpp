@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@
 #include "IntervalEditor.h"
 #include "DeleteCursorData.xbm"
 
-using namespace O1Plot;
+using namespace FTSPlot;
 
 IntervalEditor::IntervalEditor ( SimpleViewWidget* plotWidget )
 {
@@ -2558,7 +2558,7 @@ qint64 IntervalEditor::getXmin()
     }
     else
     {
-        return O1Plot::GL_Layer::getXmin();
+        return FTSPlot::GL_Layer::getXmin();
     }
 }
 
@@ -2571,7 +2571,7 @@ qint64 IntervalEditor::getXmax()
     }
     else
     {
-        return O1Plot::GL_Layer::getXmax();
+        return FTSPlot::GL_Layer::getXmax();
     }
 }
 

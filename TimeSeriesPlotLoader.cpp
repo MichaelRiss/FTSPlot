@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -27,14 +27,14 @@
 #define MIN(a,b) a<b?a:b
 
 using namespace std;
-using namespace O1Plot;
+using namespace FTSPlot;
 
-bool O1Plot::isPow2( int a )
+bool FTSPlot::isPow2( int a )
 {
     return !(a & (a-1));
 }
 
-int O1Plot::intlog2( int a )
+int FTSPlot::intlog2( int a )
 {
     int ret = -1;
     while (a != 0) {

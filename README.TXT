@@ -1,8 +1,8 @@
-O1Plot
+FTSPlot
 
 About:
 
-O1Plot is a tool for efficiently visualizing large datasets as 
+FTSPlot is a tool for efficiently visualizing large datasets as 
 they are common in Electrophysiology/Neuroscience.
 
 System requirements:
@@ -16,12 +16,12 @@ Installation:
 The installation is based on the cmake configuration utility.
 
 - Create a build directory.
-  "mkdir O1Plot-build"
+  "mkdir FTSPlot-build"
 - Change to the build directory.
-  "cd O1Plot-build" 
+  "cd FTSPlot-build" 
 - Run the cmake configuration utility with the path of the
   source directory as argument.
-  "cmake ../O1Plot"
+  "cmake ../FTSPlot"
 - Adapt the configuration to your needs, e.g. make sure you
   do a static link on the binary.
   Available tuning parameters:
@@ -49,9 +49,9 @@ to the destination folder of choice.
 
 Short tutorial on visualizing timeseries datasets:
 
-O1Prep
-Before visualizing a timeseries dataset in "O1Plot" the dataset needs to
-be prepared. This is done with the program "O1Prep". As the preparation 
+FTSPrep
+Before visualizing a timeseries dataset in "FTSPlot" the dataset needs to
+be prepared. This is done with the program "FTSPrep". As the preparation 
 of big timeseries datasets can take quite some time, the program is 
 separated from the main program and can process several datafiles
 in batch mode.
@@ -64,10 +64,10 @@ so that the preparation process resumes at that point the next time.
 The preparation process generates several additional files alongside the
 original dataset. The reduced datasets carry number suffixes, the 
 configuration file for the dataset carries the "*.cfg" suffix. It
-is used to open the dataset in O1Plot.
+is used to open the dataset in FTSPlot.
 
 
-O1Plot
+FTSPlot
 After starting the program the main window with the plotting area appears. 
 Open the module manager by clicking on the "Menu" button.
 In the module manager click on the "Add TimeSeries" button and select
@@ -215,12 +215,12 @@ the new current interval.
 
 
 Tests:
-The "runTests" binary comprises a rudimentary test suite for the O1Plot library.
+The "runTests" binary comprises a rudimentary test suite for the FTSPlot library.
 While being far from exhaustive these basic tests should pass on any platform.
 
 
 Benchmarks:
-"O1PlotBench" is a tool to run benchmarks. Three different types of benchmarks 
+"FTSPlotBench" is a tool to run benchmarks. Three different types of benchmarks 
 can be selected, Timeseries, EventEditor or IntervalEditor benchmarks.
 Select the desired dataset and a directory for the benchmark results and 
 click on the corresponding "Start benchmark" button.

@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -22,26 +22,26 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
-#include "O1Prep.h"
+#include "FTSPrep.h"
 
-using namespace O1Plot;
+using namespace FTSPlot;
 
-O1Prep::O1Prep()
+FTSPrep::FTSPrep()
 {
     state = ready;
     granularity = 2048;
 }
 
-O1Prep::~O1Prep()
+FTSPrep::~FTSPrep()
 {}
 
-void O1Prep::setProgressGranularity(quint64 gran )
+void FTSPrep::setProgressGranularity(quint64 gran )
 {
     granularity = gran;
 }
 
 
-bool O1Prep::setNewFile ( QString fileName, quint64 thinfactor, quint64 FileSizeLimit )
+bool FTSPrep::setNewFile ( QString fileName, quint64 thinfactor, quint64 FileSizeLimit )
 {
     QMutexLocker myLocker ( &threadlock );
     if ( state == busy )
@@ -55,7 +55,7 @@ bool O1Prep::setNewFile ( QString fileName, quint64 thinfactor, quint64 FileSize
     return true;
 }
 
-bool O1Prep::setresumeFile ( QString fileName, quint64 thinfactor, quint64 FileSizeLimit,
+bool FTSPrep::setresumeFile ( QString fileName, quint64 thinfactor, quint64 FileSizeLimit,
                              quint64 level, quint64 position )
 {
     QMutexLocker myLocker ( &threadlock );
@@ -72,7 +72,7 @@ bool O1Prep::setresumeFile ( QString fileName, quint64 thinfactor, quint64 FileS
     return true;
 }
 
-ResumeData O1Prep::getResumeData()
+ResumeData FTSPrep::getResumeData()
 {
     ResumeData value;
     value.ResumethinFactor = ResumethinFactor;
@@ -81,12 +81,12 @@ ResumeData O1Prep::getResumeData()
 }
 
 
-void O1Prep::stopforResume()
+void FTSPrep::stopforResume()
 {
     abort = true;
 }
 
-void O1Prep::run()
+void FTSPrep::run()
 {
     threadlock.lock();
     state = busy;

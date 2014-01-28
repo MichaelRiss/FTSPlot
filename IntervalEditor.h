@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -27,7 +27,7 @@
 #include "Interval.h"
 #include "HideNotifyWidget.h"
 
-namespace O1Plot
+namespace FTSPlot
 {
 
 class IntervalEditor : public GL_Layer
@@ -75,7 +75,7 @@ private:
     QString treeRootDirName;
     QString originalModuleName;
     GUIstate state;
-    bool findFirstInterval ( O1Plot::Interval& inter );
+    bool findFirstInterval ( FTSPlot::Interval& inter );
     bool findLastInterval( Interval& inter );
     QVector< Interval > findFirstInterval ( QString path );
     QVector< Interval > findLastInterval( QString path );
@@ -86,7 +86,7 @@ private:
     SimpleViewWidget* svw;
     bool RemoveDirectory ( QDir aDir );
     QString flatFileName;
-    bool recursiveTreeExport ( QVector< O1Plot::Interval >& blockArray, QString currentDirName, QFile& flatFile ) throw (QString);
+    bool recursiveTreeExport ( QVector< FTSPlot::Interval >& blockArray, QString currentDirName, QFile& flatFile ) throw (QString);
     int reqDisplayPower;
     double ymin;
     double ymax;
@@ -107,10 +107,10 @@ private:
     void cleanupDirectories ( QStringList pathList );
     bool isEmpty();
     bool searchNextInterval ( Interval inter, Interval& nextInter );
-    //bool searchNextInterval_sub ( O1Plot::Interval inter, O1Plot::Interval& nextInter, bool firstDescent, QString path, QVector< O1Plot::Interval > vec, int height );
-    bool searchNextInterval_sub ( O1Plot::Interval inter, O1Plot::Interval& nextInter, bool firstDescent, QString path, int height );
+    //bool searchNextInterval_sub ( FTSPlot::Interval inter, FTSPlot::Interval& nextInter, bool firstDescent, QString path, QVector< FTSPlot::Interval > vec, int height );
+    bool searchNextInterval_sub ( FTSPlot::Interval inter, FTSPlot::Interval& nextInter, bool firstDescent, QString path, int height );
     bool searchPrevInterval ( Interval inter, Interval& prevInter );
-    QVector< Interval > searchPrevInterval_sub ( O1Plot::Interval inter, bool firstDescent, QString path, int height );
+    QVector< Interval > searchPrevInterval_sub ( FTSPlot::Interval inter, bool firstDescent, QString path, int height );
     QStringList orderBlockBeforeDir ( QStringList in );
     QStringList orderDirBeforeBlock ( QStringList in );
     QString manualLow;

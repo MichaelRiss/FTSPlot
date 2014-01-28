@@ -1,4 +1,4 @@
-/* O1Plot - fast time series dataset plotter
+/* FTSPlot - fast time series dataset plotter
    Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 #include "SimpleViewWidget.h"
 #include "TimeSeriesPlot.h"
 
-using namespace O1Plot;
+using namespace FTSPlot;
 
 class TimeSeriesPlotTest : public QObject
 {
