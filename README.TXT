@@ -4,6 +4,15 @@ About:
 
 FTSPlot is a tool for efficiently visualizing large datasets as 
 they are common in Electrophysiology/Neuroscience.
+You can find the corresponding paper with the description of
+the algorithm here: 
+
+Riss, M. (2014) FTSPlot: Fast Time Series Visualization for Large Datasets.
+PLoS ONE 9(4): e94694. doi:10.1371/journal.pone.0094694
+
+When using this software in your projects please reference this 
+paper in your publications.
+
 
 System requirements:
 - Qt >= 4.7
