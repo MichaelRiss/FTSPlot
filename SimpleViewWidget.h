@@ -27,7 +27,7 @@ class SimpleViewWidget;
 }
 
 #include <QSet>
-#include <QGLWidget>
+#include <QOpenGLWidget>
 #if defined(Q_WS_MAC)
 # include <OpenGL/glu.h>
 #else
@@ -77,7 +77,7 @@ public:
     bool editable;
 };
 
-class SimpleViewWidget : public QGLWidget
+class SimpleViewWidget : public QOpenGLWidget
 {
     Q_OBJECT
 

@@ -75,7 +75,9 @@ IntervalEditor::IntervalEditor ( SimpleViewWidget* plotWidget )
     gui->show();
 
     svw = plotWidget;
-    ill = new IntervalListLoader ( svw );
+    ill = new IntervalListLoader ( svw->context() );
+    workerThread = new QThread( this );
+    ill->moveToThread( workerThread );
 
     connect ( ill, SIGNAL ( notifyListUpdate() ),
               this, SLOT ( threadDone() ) );
@@ -524,7 +526,7 @@ bool IntervalEditor::openTreeDir ( QString TreeDirPath )
 
 void IntervalEditor::openIntervalList()
 {
-    IntervalListLoader_Suspend lock ( ill );
+    IntervalListLoader_Suspend lock ( workerThread );
     intervalListDirName =
         QFileDialog::getExistingDirectory ( NULL, "IntervalList Tree Directory", intervalListDirName, QFileDialog::ShowDirsOnly );
 
@@ -546,7 +548,7 @@ bool IntervalEditor::closeTreeDir()
 
 void IntervalEditor::closeIntervalList()
 {
-    IntervalListLoader_Suspend lock ( ill );
+    IntervalListLoader_Suspend lock ( workerThread );
     state = NoTree;
     updateGUI();
     disconnect ( ui.openIntervalListButton, SIGNAL ( clicked() ),
@@ -1270,7 +1272,7 @@ bool IntervalEditor::addInterval ( Interval inter )
         return false;
     }
 
-    IntervalListLoader_Suspend lock ( ill );
+    IntervalListLoader_Suspend lock ( workerThread );
 
     // calculate path
     QString filePath = genBlockFileName( inter );
@@ -1740,7 +1742,7 @@ bool IntervalEditor::delInterval ( Interval inter )
     {
         return false;
     }
-    IntervalListLoader_Suspend lock ( ill );
+    IntervalListLoader_Suspend lock ( workerThread );
     // generate path
     QString path = generatePath( inter, interval2height( inter ), ".block" );
 
@@ -2330,7 +2332,7 @@ void IntervalEditor::lowerMinusHandler()
     // del interval
     delInterval ( currentInterval );
     // wait until the event loop is ready again
-    ill->eventLoopAlive();
+    //ill->eventLoopAlive();
     // add interval
     addInterval ( newCurrent );
     currentInterval = newCurrent;
@@ -2353,7 +2355,7 @@ void IntervalEditor::lowerPlusHandler()
     // del interval
     delInterval ( currentInterval );
     // wait until the event loop is ready again
-    ill->eventLoopAlive();
+    //ill->eventLoopAlive();
     // add interval
     addInterval ( newCurrent );
     currentInterval = newCurrent;
@@ -2376,7 +2378,7 @@ void IntervalEditor::upperMinusHandler()
     // del interval
     delInterval ( currentInterval );
     // wait until the event loop is ready again
-    ill->eventLoopAlive();
+    //ill->eventLoopAlive();
     // add interval
     addInterval ( newCurrent );
     currentInterval = newCurrent;
@@ -2399,7 +2401,7 @@ void IntervalEditor::upperPlusHandler()
     // del interval
     delInterval ( currentInterval );
     // wait until the event loop is ready again
-    ill->eventLoopAlive();
+    //ill->eventLoopAlive();
     // add interval
     addInterval ( newCurrent );
     currentInterval = newCurrent;
@@ -2460,7 +2462,7 @@ void IntervalEditor::handleFineTuneLow ( )
             Interval newCurrent = currentInterval;
             newCurrent.begin = value;
             delInterval ( currentInterval );
-            ill->eventLoopAlive();
+            //ill->eventLoopAlive();
             addInterval ( newCurrent );
             currentInterval = newCurrent;
             updateGUI();
@@ -2492,7 +2494,7 @@ void IntervalEditor::handleFineTuneHigh ( )
             Interval newCurrent = currentInterval;
             newCurrent.end = value;
             delInterval ( currentInterval );
-            ill->eventLoopAlive();
+            //ill->eventLoopAlive();
             addInterval ( newCurrent );
             currentInterval = newCurrent;
             updateGUI();

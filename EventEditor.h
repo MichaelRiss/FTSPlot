@@ -85,6 +85,7 @@ private:
     QCursor DeleteCursor;
     QList<qint64> eventLists[2];
     EventEditorLoader* eel;
+    QThread* workerThread;
     bool delEventInRange ( quint64 xBegin, quint64 xEnd );
     bool hasEvent ( quint64 xBegin, quint64 xEnd, QString path, quint64 pathValue, int height );
     bool findFirstEvent ( quint64* event, QString path, int height );

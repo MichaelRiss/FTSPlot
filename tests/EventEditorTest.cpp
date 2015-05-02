@@ -45,6 +45,7 @@ void EventEditorTest::cleanupTestCase()
 
 void EventEditorTest::createAndDestroyEventEditorModule()
 {
+	QCoreApplication::processEvents();
     eeModule = tsplot->addEventEditorModule( "testData/EventEditorTest" );
     QVERIFY( eeModule != NULL );
     

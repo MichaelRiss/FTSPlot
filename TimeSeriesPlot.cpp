@@ -32,7 +32,9 @@
 using namespace std;
 using namespace FTSPlot;
 
-TimeSeriesPlot::TimeSeriesPlot( SimpleViewWidget* glwindow )
+TimeSeriesPlot::TimeSeriesPlot( SimpleViewWidget* glwindow ) :
+		red(0.0), green(0.0), blue(0.0),
+		workerThread( new QThread() )
 {
     useList = -1;
     genList = -1;
@@ -45,16 +47,22 @@ TimeSeriesPlot::TimeSeriesPlot( SimpleViewWidget* glwindow )
     displayLists[1] = glGenLists( 1 );
     if ( displayLists[0] == 0 || displayLists[1] == 0 )
     {
-        cout << "Error: Cannot reserve display list. Exiting." << endl;
+        cerr << "Error: Cannot reserve display list. Exiting." << endl;
         exit(1);
     }
-    worker = new TimeSeriesPlotLoader( glwindow );
+    worker = new TimeSeriesPlotLoader( glwindow->context() );
+    worker->moveToThread( workerThread );
+    qRegisterMetaType<GLuint>("GLuint");
+    connect( this, SIGNAL(requestNewDisplayLists(qint64, qint64, int, GLuint)),
+    		 worker, SLOT(genDisplayList(qint64, qint64, int, GLuint )) );
     connect( worker, SIGNAL( notifyListUpdate() ), this, SLOT( receiceListUpdate() ) );
 }
 
 TimeSeriesPlot::~TimeSeriesPlot()
 {
     disconnect( worker, SIGNAL( notifyListUpdate() ), this, SLOT( receiceListUpdate() ) );
+    workerThread->wait();
+    delete( workerThread );
     delete( worker );
 
     // delete displayLists
@@ -103,7 +111,8 @@ void TimeSeriesPlot::genDisplayList( qint64 Xbegin, qint64 Xend, int reqPower, d
     {
         genList = 1;
     }
-    worker->genDisplayList( Xbegin, Xend, reqPower, displayLists[genList] );
+    emit requestNewDisplayLists( Xbegin, Xend, reqPower, displayLists[genList] );
+    //worker->genDisplayList( Xbegin, Xend, reqPower, displayLists[genList] );
 }
 
 void TimeSeriesPlot::toggleLists()

@@ -20,7 +20,8 @@
 #define INTERVALLISTLOADER_H
 
 #include <QThread>
-#include <QGLWidget>
+#include <QOpenGLContext>
+#include <QColor>
 #include <QMutex>
 #include <QWaitCondition>
 #include "Interval.h"
@@ -29,56 +30,69 @@
 namespace FTSPlot
 {
 
-class IntervalListLoader : public QThread
+class IntervalListLoader : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    IntervalListLoader ( QGLWidget* parent = 0 );
-    ~IntervalListLoader();
-    void paintGL();
-    void eventLoopAlive();
-    void setColor( QColor color );
-    void toggleLists();
+	IntervalListLoader ( QOpenGLContext* context = 0 );
+	~IntervalListLoader();
+	void paintGL();
+	//void eventLoopAlive();
+	void setColor( QColor color );
+	void toggleLists();
 
 protected:
-    virtual void run();
+	//virtual void run();
 
 private:
-    QMutex lock;
-    QWaitCondition waitCond;
-    int eventLoopTestCounter0;
-    int eventLoopTestCounter1;
-    QGLWidget* glwidget;
-    QGLWidget* myGLwidget;
-    //QGLContext* myGLContext;
-    GLuint displayLists[2];
-    int useList;
-    int genList;
-    QColor myColor;
-    GLfloat red;
-    GLfloat green;
-    GLfloat blue;
-    void getRecursiveEvents( InlineVec<GLdouble>& BoxArray, InlineVec<GLdouble>& LineArray, quint64 beginIdx, quint64 endIdx, QString path, quint64 pathValue, int reqDispPower, qint64 reqXdataBegin, double ymin, double ymax, int height );
-    
-signals:
-    void notifyListUpdate();
-    void checkEventLoopSignal ( int counter );
+	//QMutex lock;
+	QWaitCondition waitCond;
+	int eventLoopTestCounter0;
+	int eventLoopTestCounter1;
+	//QGLWidget* glwidget;
+	//QGLWidget* myGLwidget;
+	QOpenGLContext* myGLContext;
+	QSurface* mySurface;
+	//QGLContext* myGLContext;
+	GLuint displayLists[2];
+	int useList;
+	int genList;
+	QColor myColor;
+	GLfloat red;
+	GLfloat green;
+	GLfloat blue;
+	void getRecursiveEvents( InlineVec<GLdouble>& BoxArray, InlineVec<GLdouble>& LineArray, quint64 beginIdx, quint64 endIdx, QString path, quint64 pathValue, int reqDispPower, qint64 reqXdataBegin, double ymin, double ymax, int height );
 
-public slots:
-    void genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataEnd, int reqDispPower, QString treeDirName, double ymin, double ymax );
-    void checkEventLoop ( int counter );
+	signals:
+	void notifyListUpdate();
+	void checkEventLoopSignal ( int counter );
+
+	public slots:
+	void genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataEnd, int reqDispPower, QString treeDirName, double ymin, double ymax );
+	//void checkEventLoop ( int counter );
 
 };
+
+//class IntervalListLoader_Suspend
+//{
+//public:
+//    IntervalListLoader_Suspend ( IntervalListLoader* lockarg );
+//    ~IntervalListLoader_Suspend();
+//
+//private:
+//    IntervalListLoader* lock;
+//};
 
 class IntervalListLoader_Suspend
 {
 public:
-    IntervalListLoader_Suspend ( IntervalListLoader* lockarg );
-    ~IntervalListLoader_Suspend();
+	IntervalListLoader_Suspend ( QThread* thread );
+	~IntervalListLoader_Suspend();
 
 private:
-    IntervalListLoader* lock;
+	QThread* lock;
 };
+
 
 }
 

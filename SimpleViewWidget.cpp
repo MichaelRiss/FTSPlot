@@ -46,7 +46,7 @@ Qt::GlobalColor SimpleViewWidget::stdColors[] = { Qt::black, Qt::red, Qt::green,
                                                 };
 
 SimpleViewWidget::SimpleViewWidget ( QWidget* parent ) :
-        QGLWidget ( parent ), svm ( this )
+        QOpenGLWidget ( parent ), svm ( this )
 {
     windowWidth = 0;
     windowHeight = 0;
@@ -87,6 +87,7 @@ SimpleViewWidget::~SimpleViewWidget()
 
 void SimpleViewWidget::initializeGL()
 {
+	qDebug() << "SimpleViewWidget::initializeGL() called.";
     glClearColor ( 1.0, 1.0, 1.0, 1.0 );
     glShadeModel ( GL_FLAT );
 
@@ -95,7 +96,7 @@ void SimpleViewWidget::initializeGL()
     glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glHint ( GL_LINE_SMOOTH_HINT, GL_DONT_CARE );
     glLineWidth ( 1.0 );
-
+    qDebug() << "SimpleViewWidget::initializeGL() completed.";
 }
 
 
@@ -232,9 +233,9 @@ void SimpleViewWidget::paintGL()
     GLenum err = glGetError();
     if ( err != GL_NO_ERROR )
     {
-        //cout << "SimpleViewWidget paintGL: " << gluErrorString ( err ) << endl;
+        qDebug() << "SimpleViewWidget paintGL: " << gluErrorString ( err );
     }
-
+    qDebug() << "paintGL called.";
 }
 
 void SimpleViewWidget::mousePressEvent ( QMouseEvent* event )
@@ -373,6 +374,7 @@ void SimpleViewWidget::mouseMoveEvent ( QMouseEvent* event )
     QString message;
     message = message + QString::number ( ( qint64 ) crossHairX ) + ", "
               + QString::number ( crossHairY );
+    qDebug() << "writeCrossCoords emitted: " << message;
     emit writeCrossCoords ( message, 0 );
 }
 

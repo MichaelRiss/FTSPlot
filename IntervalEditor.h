@@ -83,6 +83,7 @@ private:
     Interval currentInterval;
     void updateGUI();
     IntervalListLoader* ill;
+    QThread* workerThread;
     SimpleViewWidget* svw;
     bool RemoveDirectory ( QDir aDir );
     QString flatFileName;

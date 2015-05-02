@@ -20,7 +20,8 @@
 #define EVENTLISTLOADER_H
 
 #include <QThread>
-#include <QGLWidget>
+#include <QOpenGLContext>
+#include <QColor>
 #include <QMutex>
 #include <QWaitCondition>
 #include "EditorUtils.hpp"
@@ -29,22 +30,24 @@
 namespace FTSPlot
 {
 
-class EventEditorLoader : public QThread
+class EventEditorLoader : public QObject
 {
     Q_OBJECT
 public:
-    EventEditorLoader ( QGLWidget* parent = 0 );
+    EventEditorLoader ( QOpenGLContext* context = 0 );
     ~EventEditorLoader();
     void paintGL();
     void setColor( QColor color );
     void toggleLists();
-    void eventLoopAlive();
+    //void eventLoopAlive();
 protected:
-    virtual void run();
+    //virtual void run();
 
 private:
-    QGLWidget* glwidget;
-    QGLWidget* myGLwidget;
+    //QGLWidget* glwidget;
+    QOpenGLContext* myOpenGLContext;
+
+    //QGLWidget* myGLwidget;
     GLuint displayLists[2];
     QColor myColor;
     GLfloat red;
@@ -55,8 +58,8 @@ private:
     int eventLoopTestCounter0;
     int eventLoopTestCounter1;
     void getRecursiveEvents( quint64 beginIdx, quint64 endIdx, QString path, quint64 pathValue, int height, int reqDispPower, qint64 reqXdataBegin, double ymin, double ymax );
-    QMutex lock;
-    QWaitCondition waitCond;
+    //QMutex lock;
+    //QWaitCondition waitCond;
 
 #ifdef COUNT_TILES
     qint64 vertexCount;
@@ -69,17 +72,17 @@ signals:
 
 public slots:
     void genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataEnd, int reqDispPower, QString baseDirName, double ymin, double ymax );
-    void checkEventLoop( int counter );
+    //void checkEventLoop( int counter );
 };
 
 class EventEditorLoader_Suspend
 {
 public:
-    EventEditorLoader_Suspend( EventEditorLoader* lock );
+    EventEditorLoader_Suspend( QThread* thread );
     ~EventEditorLoader_Suspend();
     
 private:
-    EventEditorLoader* lock;
+    QThread* lock;
 };
 
 }

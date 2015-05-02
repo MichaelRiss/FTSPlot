@@ -59,10 +59,12 @@ private:
     GLfloat green;
     GLfloat blue;
     QString fileName;
+    QThread* workerThread;
 public slots:
     void receiceListUpdate();
 signals:
-    //void notifyListUpdate( GL_Layer* module );
+    void requestNewDisplayLists( qint64 Xbegin, qint64 Xend,
+            					 int reqPower, GLuint displayList );
     void triggerRepaint();
 };
 

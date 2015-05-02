@@ -22,7 +22,7 @@
 #include <cmath>
 #include <iostream>
 #include <QThread>
-#include <QGLWidget>
+#include <QOpenGLContext>
 #if defined(Q_WS_MAC)
 # include <OpenGL/glu.h>
 #else
@@ -46,31 +46,31 @@ namespace FTSPlot
     bool isPow2( int a );
     int intlog2( int a );
     
-class TimeSeriesPlotLoader : public QThread
+class TimeSeriesPlotLoader : public QObject
 {
     Q_OBJECT
 public:
-    TimeSeriesPlotLoader ( QGLWidget* glwindow );
+    TimeSeriesPlotLoader ( QOpenGLContext* context );
     ~TimeSeriesPlotLoader();
     bool openFile ( QString fileName );
-    void genDisplayList ( qint64 Xbegin, qint64 Xend,
-                          int reqPower, GLuint displayList );
-    void run();
+    //void run();
     void stop();
     double getMin();
     double getMax();
     qint64 getXMin();
     qint64 getXMax();
 private:
-    QGLWidget* glwindow;
-    QGLWidget* myGLwidget;
+    bool initialized;
+    bool initGL();
+    //QGLWidget* glwindow;
+    //QGLWidget* myGLwidget;
+    QOpenGLContext* myGLContext;
+    QSurface* mySurface;
     bool filesready;
     double recordMin;
     double recordMax;
     QVector <mmapFileInfo> files;
     qint64 NoSamples;
-    QMutex ctrlLock;
-    QWaitCondition ctrlWait;
     qint64 reqBegin;
     qint64 reqEnd;
     int reqPower;
@@ -78,10 +78,13 @@ private:
     qint64 end;
     int power;
     GLuint reqDispList;
-    bool newJob;
-    bool done;
-    bool stopThread;
+    //bool newJob;
+    //bool done;
+    //bool stopThread;
     GLuint dispList;
+public slots:
+	void genDisplayList ( qint64 Xbegin, qint64 Xend,
+                          int reqPower, GLuint displayList );
 signals:
     void notifyListUpdate();
 };

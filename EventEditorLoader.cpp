@@ -31,19 +31,30 @@
 
 using namespace FTSPlot;
 
-EventEditorLoader::EventEditorLoader ( QGLWidget* parent )
+EventEditorLoader::EventEditorLoader ( QOpenGLContext* glcontext ) :
+		red( 0.0 ), green( 0.0 ), blue( 0.0 )
 {
-    glwidget = parent;
+    //glwidget = parent;
+	myOpenGLContext = new QOpenGLContext( this );
+	myOpenGLContext->setFormat( glcontext->format() );
+	myOpenGLContext->setScreen( glcontext->screen() );
+	myOpenGLContext->setShareContext( glcontext->shareContext() );
+	if( !myOpenGLContext->create() ){
+		qDebug() << "Cannot create new context.";
+		exit(1);
+	}
 
 
-    myGLwidget = new QGLWidget( glwidget->format(), NULL, glwidget );
-    if ( myGLwidget->format() != glwidget->format() )
+    //myGLwidget = new QGLWidget( glwidget->format(), NULL, glwidget );
+    //if ( myGLwidget->format() != glwidget->format() )
+	if( !QOpenGLContext::areSharing( glcontext, myOpenGLContext ) )
     {
         qDebug() << "EventEditorLoader: Cannot get the same GL context format as main widget. Exiting!";
         exit(1);
     }
 
-    glwidget->makeCurrent();
+    //glwidget->makeCurrent();
+	myOpenGLContext->makeCurrent(  glcontext->surface() );
     //myGLwidget->makeCurrent();
 
     // We also have to initialize this OpenGL Context to use alpha blending for example
@@ -71,21 +82,25 @@ EventEditorLoader::EventEditorLoader ( QGLWidget* parent )
     eventLoopTestCounter1 = 0;
 
     connect ( this, SIGNAL ( checkEventLoopSignal ( int ) ), this, SLOT ( checkEventLoop ( int ) ) );
-    moveToThread ( this );
-    start();
+    myOpenGLContext->doneCurrent();
+    //moveToThread ( this );
+    //start();
 }
 
 EventEditorLoader::~EventEditorLoader()
 {
-    quit();
-    wait();
+    //quit();
+    //wait();
     // delete displaylists
     //glwidget->makeCurrent();
-    myGLwidget->makeCurrent();
+    //myGLwidget->makeCurrent();
+    myOpenGLContext->makeCurrent( myOpenGLContext->surface() );
     glDeleteLists ( displayLists[1], 1 );
     glDeleteLists ( displayLists[0], 1 );
-    myGLwidget->doneCurrent();
-    delete( myGLwidget );
+    //myGLwidget->doneCurrent();
+    myOpenGLContext->doneCurrent();
+    delete( myOpenGLContext );
+    //delete( myGLwidget );
 }
 
 
@@ -121,7 +136,14 @@ void EventEditorLoader::genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataEn
     lineCount = 0;
 #endif // COUNT_TILES
     
-    myGLwidget->makeCurrent();
+    if( !myOpenGLContext->isValid() ){
+    	myOpenGLContext->makeCurrent( myOpenGLContext->surface() );
+    	if( !myOpenGLContext->isValid() ){
+    		qDebug() << "Invalid GL context!";
+    		return;
+    	}
+    }
+    //myGLwidget->makeCurrent();
     // call recursive function
     glNewList ( displayLists[genList], GL_COMPILE );
     if ( !baseDirName.isEmpty() )
@@ -345,12 +367,12 @@ void EventEditorLoader::getRecursiveEvents ( quint64 beginIdx, quint64 endIdx, Q
 }
 
 
-void EventEditorLoader::run()
-{
-    myGLwidget->makeCurrent();
-    exec();
-    myGLwidget->doneCurrent();
-}
+//void EventEditorLoader::run()
+//{
+//    myGLwidget->makeCurrent();
+//    exec();
+//    myGLwidget->doneCurrent();
+//}
 
 void EventEditorLoader::setColor ( QColor color )
 {
@@ -375,31 +397,31 @@ void EventEditorLoader::toggleLists()
 }
 
 
-void EventEditorLoader::eventLoopAlive()
+//void EventEditorLoader::eventLoopAlive()
+//{
+//    int myTicket = ++eventLoopTestCounter0;
+//    emit checkEventLoopSignal ( myTicket );
+//    lock.lock();
+//    while ( eventLoopTestCounter1 != myTicket )
+//    {
+//        waitCond.wait ( &lock );
+//    }
+//    lock.unlock();
+//}
+//
+//
+//void EventEditorLoader::checkEventLoop ( int counter )
+//{
+//    lock.lock();
+//    eventLoopTestCounter1 = counter;
+//    waitCond.wakeAll();
+//    lock.unlock();
+//}
+
+
+EventEditorLoader_Suspend::EventEditorLoader_Suspend ( QThread* thread )
 {
-    int myTicket = ++eventLoopTestCounter0;
-    emit checkEventLoopSignal ( myTicket );
-    lock.lock();
-    while ( eventLoopTestCounter1 != myTicket )
-    {
-        waitCond.wait ( &lock );
-    }
-    lock.unlock();
-}
-
-
-void EventEditorLoader::checkEventLoop ( int counter )
-{
-    lock.lock();
-    eventLoopTestCounter1 = counter;
-    waitCond.wakeAll();
-    lock.unlock();
-}
-
-
-EventEditorLoader_Suspend::EventEditorLoader_Suspend ( EventEditorLoader* lock )
-{
-    this->lock = lock;
+    this->lock = thread;
     lock->quit();
     lock->wait();
 }

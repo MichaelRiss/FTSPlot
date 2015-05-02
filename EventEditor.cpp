@@ -54,7 +54,10 @@ EventEditor::EventEditor ( SimpleViewWidget* plotWidget ) : GL_Layer()
     gui->show();
 
     svw = plotWidget;
-    eel = new EventEditorLoader ( svw );
+    eel = new EventEditorLoader ( svw->context() );
+    workerThread = new QThread( this );
+    eel->moveToThread( workerThread );
+
 
     connect ( eel, SIGNAL ( notifyListUpdate() ),
               this, SLOT ( threadDone() ) );
@@ -552,6 +555,7 @@ bool EventEditor::openTreeDir ( QString EventListDirectory )
     {
         return false;
     }
+    EventEditorLoader_Suspend lock( workerThread );
     eventListDirName = QDir ( EventListDirectory ).absolutePath();
 
     // either empty or having a "root" directory
@@ -641,6 +645,7 @@ bool EventEditor::closeTreeDir()
     {
         return false;
     }
+    EventEditorLoader_Suspend lock( workerThread );
     closeEventList();
     return true;
 }
@@ -1159,7 +1164,7 @@ bool EventEditor::addEvent ( quint64 xpos )
         return false;
     }
     // Shut down thread to avoid interference
-    EventEditorLoader_Suspend lock ( eel );
+    EventEditorLoader_Suspend lock ( workerThread );
 
     QString filePath = generatePath( xpos, 0, ".block" );
 
@@ -1363,7 +1368,7 @@ bool EventEditor::delEventInRange ( quint64 xBegin, quint64 xEnd )
         return false;
     }
 
-    EventEditorLoader_Suspend lock ( eel );
+    EventEditorLoader_Suspend lock ( workerThread );
     quint64 deletedEvent;
     if ( delEvent_sub ( xBegin, xEnd, &deletedEvent, treeRootDirName, 0, TOTALHEIGHT ) )
     {
@@ -2228,7 +2233,7 @@ void EventEditor::plusEvent()
 {
     quint64 newCurrentEvent = currentEvent+1;
     delEventInRange ( currentEvent, currentEvent );
-    eel->eventLoopAlive();
+    //eel->eventLoopAlive();
 
     addEvent ( newCurrentEvent );
 
@@ -2242,7 +2247,7 @@ void EventEditor::minusEvent()
 {
     quint64 newCurrentEvent = currentEvent-1;
     delEventInRange ( currentEvent, currentEvent );
-    eel->eventLoopAlive();
+    //eel->eventLoopAlive();
 
     addEvent ( newCurrentEvent );
 
@@ -2266,7 +2271,7 @@ void EventEditor::handleFineTune()
     {
         fineEditValue = text;
         delEvent ( currentEvent );
-        eel->eventLoopAlive();
+        //eel->eventLoopAlive();
         addEvent ( value );
         currentEvent = value;
         updateGUI();

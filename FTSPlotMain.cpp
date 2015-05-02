@@ -36,6 +36,7 @@ int main ( int argc, char *argv[] )
 #endif
 
     QApplication app ( argc, argv );
+    app.setAttribute( Qt::AA_DontCreateNativeWidgetSiblings );
 
 
     MainWindow* mainwidget = new MainWindow();
