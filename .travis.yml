@@ -1,0 +1,6 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+# just do the build for now
+script: mkdir build && cd build && cmake .. && make
