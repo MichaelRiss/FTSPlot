@@ -145,13 +145,13 @@ visualization module. The "Edit Active" radio button selects the module
 that receives editing input from the plot area of the main window.
 
 
-#### Event Editor
+### Event Editor
 Use "Open EventList" to open either an existing event list directory or 
 to create a new one. For creating a new one, use the file browser to 
 create a new directory and then select it. A new Eventlist data structure 
 will be created in the directory.  
 "Close EventList" is closing the EventList data structure.
-##### Import/Export
+#### Import/Export
 With "Import Flat File" and "Export Flat File" the EventList data structure
 can be loaded and saved into a single bulk file. This is useful for
 processing event lists in other programs and scripts.  
@@ -159,14 +159,14 @@ The events in the bulk file are saved as a series of ascendingly ordered
 binary unsigned 64 bit native endian integer values. Each integer value represents
 the sample position of an event.  
 With "Add Event at" a new event can be added at the given sample position.
-##### Plot area editing
+#### Plot area editing
 The three radio buttons "Add Event", "Select Event" and "Delete Event" 
 in the lower left area control the way mouse input in the plot area in the
 main window is interpreted. With "Add Event" a SHIFT + mouse click in the
 plot area adds a new event to the event list. With "Delete Event" events in 
 the plot area can be deleted by SHIFT+clicking on them. "Select Event" lets
 you choose a new current event by SHIFT+clicking it.
-##### Current Event Controls
+#### Current Event Controls
 As long as there is at least one event in the event list the event editor 
 keeps track of the current event. It can be selected with the mouse in the
 plot area by using "Select Event".  In the Finetuning area it can be 
@@ -178,7 +178,7 @@ the new current event location, this is useful for quickly inspecting
 an event list.
 
 
-#### Interval Editor
+### Interval Editor
 The Interval Editor control panel is analogous to the Event Editor panel.
 Use "Open IntervalList" to open/create a new IntervalList.
 "Close IntervalList" to close and disconnect from the current Interval List
@@ -215,12 +215,12 @@ As long as the "begin" values differ the order is equal to the order on the
 "begin" values. Only if the "begin" values are identical the order is based on the "end" values.  
 With "Add Interval at" and the two fields on top a new interval can be added at 
 the given sample position.
-##### Plot area editing
+#### Plot area editing
 The three radio buttons "Add Interval", "Select Interval" and "Delete Interval" 
 in the lower left area control the way mouse input in the plot area in the
 main window is interpreted. With "Add Interval" two SHIFT + mouse clicks in the
 plot area add a new interval to the interval list. With "Delete Interval" intervals in the plot area can be deleted by SHIFT+clicking on them. "Select Interval" lets you choose a new current interval by SHIFT+clicking it.
-##### Current Interval Controls
+#### Current Interval Controls
 As long as there is at least one interval in the interval list the interval editor keeps track of the current interval. It can be selected with the mouse in the plot area by using "Select Interval". In the Finetuning area the beginning and the end can be moved up/down with the "+"/"-" buttons or deleted ("Delete Current Interval"). With the buttons "Previous Interval" and "Next Interval" the current interval is set to the previous or next interval in the interval list.
 If the "Track in View" checkbox is marked the plot area is centered onto 
 the new current interval location, this is useful for quickly inspecting 
