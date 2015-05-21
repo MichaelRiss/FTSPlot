@@ -1,4 +1,5 @@
-FTSPlot https://travis-ci.org/MichaelRiss/FTSPlot.svg?branch=master
+FTSPlot
+[![Build Status](https://travis-ci.org/MichaelRiss/FTSPlot.svg?branch=master)](https://travis-ci.org/MichaelRiss/FTSPlot)
 
 About:
 
