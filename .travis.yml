@@ -10,7 +10,7 @@ before_install:
 script:
   - mkdir build 
   - cd build 
-  - cmake .. 
+  - cmake -DCMAKE_BUILD_TYPE=Release .. 
   - make
   - "export DISPLAY=:99.0"
   - cd tests
