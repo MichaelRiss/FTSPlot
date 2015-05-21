@@ -20,13 +20,8 @@
 
 using namespace FTSPlot;
 
-Interval::Interval()
-{
-    begin = 0;
-    end = 1;
-}
 
-Interval::Interval ( quint64 begin = 0, quint64 end = 1 )
+Interval::Interval ( quint64 begin, quint64 end )
 {
     this->begin = begin;
     this->end = end;
