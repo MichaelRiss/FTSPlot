@@ -37,24 +37,24 @@ The installation is based on the cmake configuration utility.
   do a static link on the binary.  
   Available tuning parameters:
   <dl>
-  <dt>BENCHREPETITIONS:</dt>
+  <dt>BENCHREPETITIONS</dt>
   <dd>This parameter is only important for benchmarking.
       It defines how many times the benchmarks are repeated.</dd>
-  <dt>BLOCKFACTOR:</dt>
+  <dt>BLOCKFACTOR</dt>
   <dd>This parameter affects the EventEditor and IntervalEditor.
-      Block and Node Files will cover index ranges of 2^BLOCKFACTOR.
+      Block and Node Files will cover index ranges of 2<sup>BLOCKFACTOR</sup>.
       The default is 20 and should yield good performance in most
       cases.</dd>
-  <dt>BRANCHFACTOR:</dt>
+  <dt>BRANCHFACTOR</dt>
   <dd>This parameter affects the EventEditor and IntervalEditor.
       he directory tree which contains the block and node files
-      will branch up with 2^BRANCHFACTOR. 
+      will branch up with 2<sup>BRANCHFACTOR</sup>. 
       The default value is 4 (=> 16 subdirectories) 
       which yields good performance in most cases.</dd>
-  <dt>COUNT_TILES:</dt>
+  <dt>COUNT_TILES</dt>
   <dd>When benchmarking also write out statistics about the amount
       of vertices, lines and quad elements generated per display list.</dd>
-  <dt>DISABLE_LINUX_FILESYSTEMCACHE:</dt>
+  <dt>DISABLE_LINUX_FILESYSTEMCACHE</dt>
   <dd>When benchmarking on Linux empty file system cache 
       between two benchmarks. Helps to get results closer to 
       "cold start" behavior but cannot empty caches on the
