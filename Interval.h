@@ -27,8 +27,7 @@ namespace FTSPlot
 class Interval
 {
 public:
-    Interval();
-    Interval ( quint64 begin, quint64 end );
+    Interval ( quint64 begin = 0, quint64 end = 1 );
     quint64 begin;
     quint64 end;
     bool operator< ( const Interval & other ) const;
