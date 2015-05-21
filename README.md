@@ -1,4 +1,4 @@
-FTSPlot
+FTSPlot https://travis-ci.org/MichaelRiss/FTSPlot.svg?branch=master
 
 About:
 
