@@ -276,7 +276,8 @@ void FTSPrepGUI::handleThreadFinish()
             
                 // check if file can be created
                 ResumeFile.setFileName( tmp );
-                if( FileTestResult = !ResumeFile.open(QIODevice::WriteOnly) )
+                FileTestResult = !ResumeFile.open(QIODevice::WriteOnly);
+                if( FileTestResult )
                 {
                     msgBox.setText( QString( "Error: Cannot open ResumeFile for writing " ) + tmp );
                     msgBox.exec();

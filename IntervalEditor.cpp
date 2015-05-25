@@ -1324,7 +1324,9 @@ bool IntervalEditor::addInterval ( Interval inter )
             return false;
         }
 
-        for ( quint64 i = blockFile.size() / sizeof ( Interval ) - 1; i >= 0 ; i-- )
+        // the for loop ends once i wraps around from 0 to max quint64
+        quint64 limit = blockFile.size() / sizeof ( Interval ) - 1;
+        for ( quint64 i = limit; i <= limit ; i-- )
         {
             if ( bufPtr[i] == inter )
             {
