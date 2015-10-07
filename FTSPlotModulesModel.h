@@ -23,7 +23,7 @@ namespace FTSPlot
 {
     
 class vizModule;
-class SimpleViewWidget;
+class FTSPlotWidget;
 
 }
 
@@ -32,11 +32,11 @@ class SimpleViewWidget;
 namespace FTSPlot
 {
 
-class SimpleViewModulesModel : public QAbstractTableModel
+class FTSPlotModulesModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    SimpleViewModulesModel ( SimpleViewWidget* upper );
+    FTSPlotModulesModel ( FTSPlotWidget* upper );
 
     int rowCount ( const QModelIndex &parent = QModelIndex() ) const;
     int columnCount ( const QModelIndex &parent = QModelIndex() ) const;
@@ -53,7 +53,7 @@ public:
     void prepend( vizModule& mod );
     void deleteModule( int idx );
 private:
-    SimpleViewWidget* dataObject;
+    FTSPlotWidget* dataObject;
 public slots:
     void GUIupdate();
 };

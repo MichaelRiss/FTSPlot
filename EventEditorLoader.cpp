@@ -31,83 +31,12 @@
 
 using namespace FTSPlot;
 
-EventEditorLoader::EventEditorLoader ( QOpenGLContext* glcontext ) :
-		red( 0.0 ), green( 0.0 ), blue( 0.0 )
+EventEditorLoader::EventEditorLoader ()
 {
-    //glwidget = parent;
-	myOpenGLContext = new QOpenGLContext( this );
-	myOpenGLContext->setFormat( glcontext->format() );
-	myOpenGLContext->setScreen( glcontext->screen() );
-	myOpenGLContext->setShareContext( glcontext->shareContext() );
-	if( !myOpenGLContext->create() ){
-		qDebug() << "Cannot create new context.";
-		exit(1);
-	}
-
-
-    //myGLwidget = new QGLWidget( glwidget->format(), NULL, glwidget );
-    //if ( myGLwidget->format() != glwidget->format() )
-	if( !QOpenGLContext::areSharing( glcontext, myOpenGLContext ) )
-    {
-        qDebug() << "EventEditorLoader: Cannot get the same GL context format as main widget. Exiting!";
-        exit(1);
-    }
-
-    //glwidget->makeCurrent();
-	myOpenGLContext->makeCurrent(  glcontext->surface() );
-    //myGLwidget->makeCurrent();
-
-    // We also have to initialize this OpenGL Context to use alpha blending for example
-    glClearColor ( 1.0, 1.0, 1.0, 1.0 );
-    glShadeModel ( GL_FLAT );
-
-    glEnable ( GL_LINE_SMOOTH );
-    glEnable ( GL_BLEND );
-    glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    glHint ( GL_LINE_SMOOTH_HINT, GL_DONT_CARE );
-    glLineWidth ( 1.0 );
-
-    displayLists[0] = glGenLists ( 1 );
-    displayLists[1] = glGenLists ( 1 );
-    if ( displayLists[0] == 0 || displayLists[1] == 0 )
-    {
-        qDebug() << "Error: Cannot reserve display list. Exiting.";
-        exit ( 1 );
-    }
-
-
-    useList = 0;
-    genList = 1;
-    eventLoopTestCounter0 = 0;
-    eventLoopTestCounter1 = 0;
-
-    connect ( this, SIGNAL ( checkEventLoopSignal ( int ) ), this, SLOT ( checkEventLoop ( int ) ) );
-    myOpenGLContext->doneCurrent();
-    //moveToThread ( this );
-    //start();
 }
 
 EventEditorLoader::~EventEditorLoader()
 {
-    //quit();
-    //wait();
-    // delete displaylists
-    //glwidget->makeCurrent();
-    //myGLwidget->makeCurrent();
-    myOpenGLContext->makeCurrent( myOpenGLContext->surface() );
-    glDeleteLists ( displayLists[1], 1 );
-    glDeleteLists ( displayLists[0], 1 );
-    //myGLwidget->doneCurrent();
-    myOpenGLContext->doneCurrent();
-    delete( myOpenGLContext );
-    //delete( myGLwidget );
-}
-
-
-void EventEditorLoader::paintGL()
-{
-    glColor3f ( red, green, blue );
-    glCallList ( displayLists[useList] );
 }
 
 void EventEditorLoader::genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataEnd, int reqDispPower, QString baseDirName, double ymin, double ymax )
@@ -136,24 +65,13 @@ void EventEditorLoader::genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataEn
     lineCount = 0;
 #endif // COUNT_TILES
     
-    if( !myOpenGLContext->isValid() ){
-    	myOpenGLContext->makeCurrent( myOpenGLContext->surface() );
-    	if( !myOpenGLContext->isValid() ){
-    		qDebug() << "Invalid GL context!";
-    		return;
-    	}
-    }
-    //myGLwidget->makeCurrent();
     // call recursive function
-    glNewList ( displayLists[genList], GL_COMPILE );
+    dList.reset();
+    dList.drawtype = GL_LINES;
     if ( !baseDirName.isEmpty() )
     {
-        glBegin ( GL_LINES );
         getRecursiveEvents ( XdataBegin, XdataEnd, baseDirName, 0, TOTALHEIGHT, reqDispPower, reqXdataBegin, ymin, ymax );
-        glEnd();
     }
-    glEndList();
-    glFlush();
     
 #if defined(COUNT_TILES) && !defined(BENCHMARK)
     qDebug() << "EventEditorLoader: generated" << vertexCount << "vertexes and" << lineCount << "lines.";
@@ -165,7 +83,7 @@ void EventEditorLoader::genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataEn
     benchmarkHelper::quadCount = 0;
 #endif
 
-    emit notifyListUpdate();
+    emit notifyListUpdate( &dList );
 }
 
 
@@ -203,8 +121,10 @@ void EventEditorLoader::getRecursiveEvents ( quint64 beginIdx, quint64 endIdx, Q
                 if ( newValue != oldValue )
                 {
                     double xcoord = newValue;
-                    glVertex2d ( xcoord, ymin );
-                    glVertex2d ( xcoord, ymax );
+                    dList.append( xcoord );
+                    dList.append( ymin );
+                    dList.append( xcoord );
+                    dList.append( ymax );
 
 #ifdef COUNT_TILES
                     vertexCount += 2;
@@ -255,8 +175,11 @@ void EventEditorLoader::getRecursiveEvents ( quint64 beginIdx, quint64 endIdx, Q
                     if ( newValue != oldValue )
                     {
                         double xcoord = newValue;
-                        glVertex2d ( xcoord, ymin );
-                        glVertex2d ( xcoord, ymax );
+                        dList.append( xcoord );
+                        dList.append( ymin );
+                        dList.append( xcoord );
+                        dList.append( ymax );
+
 
 #ifdef COUNT_TILES
                         vertexCount += 2;
@@ -329,8 +252,10 @@ void EventEditorLoader::getRecursiveEvents ( quint64 beginIdx, quint64 endIdx, Q
                     if ( newValue != oldValue )
                     {
                         double xcoord = newValue;
-                        glVertex2d ( xcoord, ymin );
-                        glVertex2d ( xcoord, ymax );
+                        dList.append( xcoord );
+                        dList.append( ymin );
+                        dList.append( xcoord );
+                        dList.append( ymax );
 
 #ifdef COUNT_TILES
                         vertexCount += 2;
@@ -366,59 +291,6 @@ void EventEditorLoader::getRecursiveEvents ( quint64 beginIdx, quint64 endIdx, Q
     }
 }
 
-
-//void EventEditorLoader::run()
-//{
-//    myGLwidget->makeCurrent();
-//    exec();
-//    myGLwidget->doneCurrent();
-//}
-
-void EventEditorLoader::setColor ( QColor color )
-{
-    myColor = color;
-    red = myColor.redF();
-    green = myColor.greenF();
-    blue = myColor.blueF();
-}
-
-void EventEditorLoader::toggleLists()
-{
-    if ( useList == 0 )
-    {
-        useList = 1;
-        genList = 0;
-    }
-    else
-    {
-        useList = 0;
-        genList = 1;
-    }
-}
-
-
-//void EventEditorLoader::eventLoopAlive()
-//{
-//    int myTicket = ++eventLoopTestCounter0;
-//    emit checkEventLoopSignal ( myTicket );
-//    lock.lock();
-//    while ( eventLoopTestCounter1 != myTicket )
-//    {
-//        waitCond.wait ( &lock );
-//    }
-//    lock.unlock();
-//}
-//
-//
-//void EventEditorLoader::checkEventLoop ( int counter )
-//{
-//    lock.lock();
-//    eventLoopTestCounter1 = counter;
-//    waitCond.wakeAll();
-//    lock.unlock();
-//}
-
-
 EventEditorLoader_Suspend::EventEditorLoader_Suspend ( QThread* thread )
 {
     this->lock = thread;
@@ -431,5 +303,3 @@ EventEditorLoader_Suspend::~EventEditorLoader_Suspend()
     lock->start();
 }
 
-
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

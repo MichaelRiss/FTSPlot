@@ -27,7 +27,7 @@ class GL_Layer;
 
 #include <QObject>
 #include <QMouseEvent>
-#include "SimpleViewWidget.h"
+#include <FTSPlotWidget.h>
 
 namespace FTSPlot
 {

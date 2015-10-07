@@ -20,12 +20,10 @@
 #define INTERVALLISTLOADER_H
 
 #include <QThread>
-#include <QOpenGLContext>
-#include <QColor>
 #include <QMutex>
-#include <QWaitCondition>
 #include "Interval.h"
 #include "EditorUtils.hpp"
+#include <DisplayListData.h>
 
 namespace FTSPlot
 {
@@ -34,54 +32,21 @@ class IntervalListLoader : public QObject
 {
 	Q_OBJECT
 public:
-	IntervalListLoader ( QOpenGLContext* context = 0 );
+	IntervalListLoader ();
 	~IntervalListLoader();
-	void paintGL();
-	//void eventLoopAlive();
-	void setColor( QColor color );
-	void toggleLists();
-
-protected:
-	//virtual void run();
-
+	displaylistdata<double> BoxList;
+	displaylistdata<double> LineList;
 private:
-	//QMutex lock;
-	QWaitCondition waitCond;
-	int eventLoopTestCounter0;
-	int eventLoopTestCounter1;
-	//QGLWidget* glwidget;
-	//QGLWidget* myGLwidget;
-	QOpenGLContext* myGLContext;
-	QSurface* mySurface;
-	//QGLContext* myGLContext;
-	GLuint displayLists[2];
-	int useList;
-	int genList;
-	QColor myColor;
-	GLfloat red;
-	GLfloat green;
-	GLfloat blue;
-	void getRecursiveEvents( InlineVec<GLdouble>& BoxArray, InlineVec<GLdouble>& LineArray, quint64 beginIdx, quint64 endIdx, QString path, quint64 pathValue, int reqDispPower, qint64 reqXdataBegin, double ymin, double ymax, int height );
+	void getRecursiveEvents( quint64 beginIdx, quint64 endIdx, QString path, quint64 pathValue, int reqDispPower, qint64 reqXdataBegin, double ymin, double ymax, int height );
 
-	signals:
-	void notifyListUpdate();
+signals:
+	void notifyListUpdate( displaylistdata<double>* BoxList, displaylistdata<double>* LineList );
 	void checkEventLoopSignal ( int counter );
 
-	public slots:
+public slots:
 	void genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataEnd, int reqDispPower, QString treeDirName, double ymin, double ymax );
-	//void checkEventLoop ( int counter );
-
 };
 
-//class IntervalListLoader_Suspend
-//{
-//public:
-//    IntervalListLoader_Suspend ( IntervalListLoader* lockarg );
-//    ~IntervalListLoader_Suspend();
-//
-//private:
-//    IntervalListLoader* lock;
-//};
 
 class IntervalListLoader_Suspend
 {
@@ -97,4 +62,4 @@ private:
 }
 
 #endif // INTERVALLISTLOADER_H
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+

@@ -23,7 +23,7 @@ void EventsTest::initTestCase()
 {
     QDir testDir;
 
-    tsplot = new SimpleViewWidget ( NULL );
+    tsplot = new FTSPlotWidget ( NULL );
     QVERIFY ( tsplot != NULL );
     tsplot->show();
 
@@ -90,4 +90,3 @@ void EventsTest::eventTests()
 
 
 #include "EventsTest.moc"
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

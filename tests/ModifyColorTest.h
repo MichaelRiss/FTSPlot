@@ -19,8 +19,9 @@
 #ifndef MODIFYCOLORTEST_H
 #define MODIFYCOLORTEST_H
 
+#include <FTSPlotWidget.h>
+
 #include <QtTest/QTest>
-#include "SimpleViewWidget.h"
 
 using namespace FTSPlot;
 
@@ -31,7 +32,7 @@ class ModifyColorTest : public QObject
 public:
 
 private:
-    SimpleViewWidget* tsplot;
+    FTSPlotWidget* tsplot;
     GL_Layer* tsModule;
     GL_Layer* eeModule;
     GL_Layer* ieModule;
@@ -43,4 +44,3 @@ private slots:
 };
 
 #endif // MODIFYCOLORTEST_H
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

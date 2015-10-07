@@ -19,8 +19,8 @@ set( BENCHREPETITIONS "1000" CACHE STRING "Number of repetitions when doing benc
 set( LINUX_DROP_CACHES_VALUE "3" CACHE STRING "Value that should be written into /proc/sys/vm/drop_caches, 1 = only free page cache, 3 = free page cache, directory entries and inodes." )
 
 set(FTSPlotLib_SRCS ResizingTableView.cpp HideNotifyWidget.cpp ColorDialogDelegate.cpp Interval.cpp IntervalListLoader.cpp IntervalEditor.cpp 
-    EventEditorLoader.cpp EventEditor.cpp YScaleBar.cpp SimpleViewWidget.cpp XScaleBar.cpp TimeSeriesPlot.cpp 
-    GL_Layer.cpp TimeSeriesPlotLoader.cpp ColorDialogEditor.cpp SimpleViewModulesModel.cpp)
+    EventEditorLoader.cpp EventEditor.cpp YScaleBar.cpp FTSPlotWidget.cpp XScaleBar.cpp TimeSeriesPlot.cpp 
+    GL_Layer.cpp TimeSeriesPlotLoader.cpp ColorDialogEditor.cpp FTSPlotModulesModel.cpp)
 # foreach(item ${FTSPlotLib_SRCS})
 #   STRING(REPLACE "cpp" "h" value ${item})
 #   set(FTSPlotLib_HDRS ${FTSPlotLib_HDRS} ${value})

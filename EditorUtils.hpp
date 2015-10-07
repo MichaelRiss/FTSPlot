@@ -232,4 +232,3 @@ inline QString event2dirName( quint64 event, int height )
 }
 
 #endif // __EVENTEDITORUTILS_HPP__
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

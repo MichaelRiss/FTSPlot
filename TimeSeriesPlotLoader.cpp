@@ -45,67 +45,22 @@ int FTSPlot::intlog2( int a )
 }
 
 
-TimeSeriesPlotLoader::TimeSeriesPlotLoader ( QOpenGLContext* glcontext )
-: initialized( false ),
-  dispList( 0 ), begin(0), end(0), reqBegin(0), reqEnd(0), power(0),
-  reqDispList(0), NoSamples(0), mySurface( glcontext->surface() )
+TimeSeriesPlotLoader::TimeSeriesPlotLoader ()
+  : begin(0), end(0), reqBegin(0), reqEnd(0), power(0),
+    NoSamples(0)
 {
-	//this->glwindow = glwindow;
-	//myGLwidget = new QGLWidget ( glwindow->format(), NULL, glwindow );
-	//myGLContext = new QGLContext( glwindow->format() );
-	//qDebug() << "Transmitted context pointer: " << glcontext;
-
-	myGLContext = new QOpenGLContext( this );
-	myGLContext->setFormat( glcontext->format() );
-	myGLContext->setScreen( glcontext->screen() );
-	myGLContext->setShareContext( glcontext->shareContext() );
-	if( !myGLContext->create() ){
-		qDebug() << "Cannot create new context.";
-		exit(1);
-	}
-
-//	if( !myGLContext->create( glcontext ) ){
-//		cout << "Failed to create new context." << endl;
-//	}
-	if ( !QOpenGLContext::areSharing( glcontext, myGLContext ) ){
-		qDebug() << "GLPlotLoader: Context is not shared. Exiting!";
-		exit ( 1 );
-	}
-	if( !myGLContext->isValid() ){
-		qDebug() << "TimeSeriesPlotLoader: Context not valid. Exiting!";
-		exit(1);
-	}
-//	if( myGLContext->format() != glcontext->format() )
-//	{
-//		cout << "GLPlotLoader: Cannot get the same GL context format as main widget. Exiting!" << endl;
-//		exit ( 1 );
-//	}
-
-	myGLContext->makeCurrent( mySurface );
-
-	//    if( !myGLContext->isValid() )
-	//    {
-	//    	cerr << "Invalid GL context!";
-	//    }
-
 	reqPower = 0;
 	filesready = false;
-	//newJob = false;
-	//stopThread = false;
 	recordMin = DoubleInfinity;
 	recordMax = -DoubleInfinity;
 
 #if defined(BENCHMARK) && defined(LINUX_DISABLE_FILESYSTEMCACHE)
 	benchmarkHelper::filesptr = &files;
 #endif
-
-	// start thread
-	//start();
 }
 
 TimeSeriesPlotLoader::~TimeSeriesPlotLoader()
 {
-	//stop();
 	uchar* lastPtr = NULL;
 	for ( int i = 0; i < files.size(); i++ )
 	{
@@ -121,8 +76,6 @@ TimeSeriesPlotLoader::~TimeSeriesPlotLoader()
 			delete ( files[i].qfile );
 		}
 	}
-	//myGLContext->doneCurrent();
-	delete( myGLContext );
 }
 
 bool TimeSeriesPlotLoader::openFile ( QString filename )
@@ -181,7 +134,6 @@ bool TimeSeriesPlotLoader::openFile ( QString filename )
 		cfgstream >> powerLevel >> levelFilename;
 
 		int power = powerLevel.toInt();
-		//if ( pow ( 2,round ( log2 ( power ) ) ) != power )
 		if (!isPow2( power ))
 		{
 			qDebug() << "Hierarchy level" << power << "isn't a power of 2.";
@@ -190,7 +142,6 @@ bool TimeSeriesPlotLoader::openFile ( QString filename )
 		}
 
 		mmapFileInfo entry;
-		//entry.pow = round ( log2 ( power ) );
 		entry.pow = intlog2( power );
 
 		entry.qfile = new QFile ( dataDirectory.filePath ( levelFilename ) );
@@ -244,11 +195,7 @@ bool TimeSeriesPlotLoader::openFile ( QString filename )
 	return true;
 }
 
-//bool TimeSeriesPlotLoader::initGL(){
-//
-//}
-
-void TimeSeriesPlotLoader::genDisplayList ( qint64 Xbegin, qint64 Xend, int reqPower, GLuint displaylist )
+void TimeSeriesPlotLoader::genDisplayList ( qint64 Xbegin, qint64 Xend, int reqPower )
 {
 	if ( !filesready )
 	{
@@ -256,67 +203,12 @@ void TimeSeriesPlotLoader::genDisplayList ( qint64 Xbegin, qint64 Xend, int reqP
 				<< endl;
 		return;
 	}
-	//	if( !initialized )
-	//	{
-	//		if( !initGL() )
-	//		{
-	//			cerr << "Cannot init GL Context, not rendering display list!" << endl;
-	//			return;
-	//		}
-	//	}
 
 	this->reqBegin = Xbegin;
 	this->reqEnd = Xend;
 	this->reqPower = reqPower;
-	this->reqDispList = displaylist;
-	//newJob = true;
-	//done = false;
 
-
-	//---------
-
-
-	//done = false;
-	//stopThread = false;
-
-	if( !myGLContext->isValid() ){
-		myGLContext->makeCurrent( mySurface );
-		if( !myGLContext->isValid() )
-		{
-			cerr << "Invalid GL context!";
-			return;
-		}
-	}
-
-	// We also have to initialize this OpenGL Context to use alpha blending for example
-	// TODO: maybe move to constructor?
-	glClearColor ( 1.0, 1.0, 1.0, 1.0 );
-	glShadeModel ( GL_FLAT );
-
-	glEnable ( GL_LINE_SMOOTH );
-	glEnable ( GL_BLEND );
-	glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	glHint ( GL_LINE_SMOOTH_HINT, GL_DONT_CARE );
-	glLineWidth ( 1.0 );
-
-
-	// waitCond
-	//		ctrlLock.lock();
-	//		if ( !newJob && !stopThread )
-	//		{
-	//			ctrlWait.wait ( &ctrlLock );
-	//		}
-	// check stopThread and exit
-	//		if ( stopThread )
-	//		{
-	//			break;
-	//		}
-	// check impossible condition !newJob && !stopThread
-	//		if ( !stopThread && !newJob )
-	//		{
-	//			cout << "PaintThread: !stopThread && !newJob => invalid condition!" << endl;
-	//			exit ( 1 );
-	//		}
+	dList.reset();
 
 #ifdef COUNT_TILES
 	qint64 vertexCount = 0;
@@ -327,15 +219,6 @@ void TimeSeriesPlotLoader::genDisplayList ( qint64 Xbegin, qint64 Xend, int reqP
 	end = reqEnd;
 
 	power = reqPower;
-	dispList = reqDispList;
-	//		done = false;
-	//		newJob = false;
-	//		ctrlLock.unlock();
-
-	//	if ( !QGLContext::currentContext() )
-	//	{
-	//		cout << "No valid GLcontext!" << endl;
-	//	}
 
 	// Finding the right dataset
 	mmapFileInfo work;
@@ -355,13 +238,13 @@ void TimeSeriesPlotLoader::genDisplayList ( qint64 Xbegin, qint64 Xend, int reqP
 		if ( power - work.pow < AGGL_THR )
 		{
 			// Draw lines
-			glNewList ( dispList, GL_COMPILE );
-			glBegin ( GL_LINE_STRIP );
+			dList.drawtype = GL_LINE_STRIP;
 			for ( qint64 i = ( MAX ( begin, 0 ) ); i < ( MIN ( end, NoSamples ) ); i++ )
 			{
 				double xcoord = ( double ) ( ( i - begin ) >>power );
 				double ycoord = ( ( double* ) work.mmap ) [i];
-				glVertex2d ( xcoord, ycoord );
+				dList.append(xcoord);
+				dList.append(ycoord);
 
 #ifdef COUNT_TILES
 				vertexCount++;
@@ -369,14 +252,11 @@ void TimeSeriesPlotLoader::genDisplayList ( qint64 Xbegin, qint64 Xend, int reqP
 #endif // COUNT_TILES
 
 			}
-			glEnd();
-			glEndList();
 		}
 		else
 		{
 			// Draw bars
-			glNewList ( dispList, GL_COMPILE );
-			glBegin ( GL_LINES );
+			dList.drawtype = GL_LINES;
 			double oldmin = DoubleNaN;
 			double oldmax = DoubleNaN;
 			qint64 loopbegin = MAX ( ( begin >> power ) << power, 0 );
@@ -402,10 +282,14 @@ void TimeSeriesPlotLoader::genDisplayList ( qint64 Xbegin, qint64 Xend, int reqP
 				// comparison should be handled correctly
 				if ( minvalue >= oldmax || maxvalue <= oldmin )
 				{
-					glVertex2d ( ( i-1 + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power,
-							( oldmin + oldmax ) / 2.0 );
-					glVertex2d ( ( i + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power,
-							( minvalue + maxvalue ) / 2.0 );
+					double xcoord = ( i-1 + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power;
+					double ycoord = ( oldmin + oldmax ) / 2.0;
+					dList.append(xcoord);
+					dList.append(ycoord);
+					xcoord = ( i + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power;
+					ycoord = ( minvalue + maxvalue ) / 2.0;
+					dList.append(xcoord);
+					dList.append(ycoord);
 
 #ifdef COUNT_TILES
 					vertexCount += 2;
@@ -413,10 +297,14 @@ void TimeSeriesPlotLoader::genDisplayList ( qint64 Xbegin, qint64 Xend, int reqP
 #endif // COUNT_TILES
 
 				}
-				glVertex2d ( ( i + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power,
-						minvalue );
-				glVertex2d ( ( i + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power,
-						maxvalue );
+				double xcoord = ( i + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power;
+				double ycoord = minvalue;
+				dList.append(xcoord);
+				dList.append(ycoord);
+				xcoord = ( i + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power;
+				ycoord = maxvalue;
+				dList.append(xcoord);
+				dList.append(ycoord);
 
 #ifdef COUNT_TILES
 				vertexCount += 2;
@@ -426,15 +314,12 @@ void TimeSeriesPlotLoader::genDisplayList ( qint64 Xbegin, qint64 Xend, int reqP
 				oldmin = minvalue;
 				oldmax = maxvalue;
 			}
-			glEnd();
-			glEndList();
 		}
 	}
 	else
 	{
 		// Draw bars
-		glNewList ( dispList, GL_COMPILE );
-		glBegin ( GL_LINES );
+		dList.drawtype = GL_LINES;
 
 		double oldmin = DoubleNaN;
 		double oldmax = DoubleNaN;
@@ -466,8 +351,14 @@ void TimeSeriesPlotLoader::genDisplayList ( qint64 Xbegin, qint64 Xend, int reqP
 
 			if ( minvalue >= oldmax || maxvalue <= oldmin )
 			{
-				glVertex2d ( ( ( i<<work.pow )-1 + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power, ( oldmin + oldmax ) / 2.0 );
-				glVertex2d ( ( ( i<<work.pow ) + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power, ( minvalue + maxvalue ) / 2.0 );
+				double xcoord = ( ( i<<work.pow )-1 + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power;
+				double ycoord = ( oldmin + oldmax ) / 2.0;
+				dList.append(xcoord);
+				dList.append(ycoord);
+				xcoord = ( ( i<<work.pow ) + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power;
+				ycoord = ( minvalue + maxvalue ) / 2.0;
+				dList.append(xcoord);
+				dList.append(ycoord);
 
 #ifdef COUNT_TILES
 				vertexCount += 2;
@@ -476,8 +367,15 @@ void TimeSeriesPlotLoader::genDisplayList ( qint64 Xbegin, qint64 Xend, int reqP
 
 			}
 
-			glVertex2d ( ( ( i<<work.pow ) + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power, minvalue );
-			glVertex2d ( ( ( i<<work.pow ) + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power, maxvalue );
+			double xcoord = ( ( i<<work.pow ) + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power;
+			double ycoord = minvalue;
+			dList.append(xcoord);
+			dList.append(ycoord);
+
+			xcoord = ( ( i<<work.pow ) + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power;
+			ycoord = maxvalue;
+			dList.append(xcoord);
+			dList.append(ycoord);
 
 #ifdef COUNT_TILES
 			vertexCount += 2;
@@ -488,14 +386,6 @@ void TimeSeriesPlotLoader::genDisplayList ( qint64 Xbegin, qint64 Xend, int reqP
 			oldmax = maxvalue;
 		}
 
-		glEnd();
-		glEndList();
-	}
-
-	GLenum err = glGetError();
-	if ( err != GL_NO_ERROR )
-	{
-		cout << "GLPlotLoader: " << gluErrorString ( err ) << endl;
 	}
 
 #if defined(COUNT_TILES) && !defined(BENCHMARK)
@@ -508,12 +398,8 @@ void TimeSeriesPlotLoader::genDisplayList ( qint64 Xbegin, qint64 Xend, int reqP
 	benchmarkHelper::quadCount = 0;
 #endif // BENCHCOUNT
 
-	//done = true;
-
-	emit notifyListUpdate();
+	emit notifyListUpdate( &dList );
 }
-
-
 
 double TimeSeriesPlotLoader::getMin()
 {
@@ -525,250 +411,6 @@ double TimeSeriesPlotLoader::getMax()
 	return recordMax;
 }
 
-//void TimeSeriesPlotLoader::run()
-//{
-//	done = false;
-//	//stopThread = false;
-//
-//	myGLContext->makeCurrent();
-//	if( !myGLContext->isValid() )
-//	{
-//		cerr << "Invalid GL context!";
-//	}
-//
-//	// We also have to initialize this OpenGL Context to use alpha blending for example
-//	glClearColor ( 1.0, 1.0, 1.0, 1.0 );
-//	glShadeModel ( GL_FLAT );
-//
-//	glEnable ( GL_LINE_SMOOTH );
-//	glEnable ( GL_BLEND );
-//	glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-//	glHint ( GL_LINE_SMOOTH_HINT, GL_DONT_CARE );
-//	glLineWidth ( 1.0 );
-//
-//	while ( 1 )
-//	{
-//		// waitCond
-//		ctrlLock.lock();
-//		if ( !newJob && !stopThread )
-//		{
-//			ctrlWait.wait ( &ctrlLock );
-//		}
-//		// check stopThread and exit
-//		if ( stopThread )
-//		{
-//			break;
-//		}
-//		// check impossible condition !newJob && !stopThread
-//		if ( !stopThread && !newJob )
-//		{
-//			cout << "PaintThread: !stopThread && !newJob => invalid condition!" << endl;
-//			exit ( 1 );
-//		}
-//
-//#ifdef COUNT_TILES
-//		qint64 vertexCount = 0;
-//		qint64 lineCount = 0;
-//#endif // COUNT_TILES
-//
-//		begin = reqBegin;
-//		end = reqEnd;
-//
-//		power = reqPower;
-//		dispList = reqDispList;
-//		done = false;
-//		newJob = false;
-//		ctrlLock.unlock();
-//
-//		if ( !QGLContext::currentContext() )
-//		{
-//			cout << "No valid GLcontext!" << endl;
-//		}
-//
-//		// Finding the right dataset
-//		mmapFileInfo work;
-//		if ( power >= files.size() )
-//		{
-//			work = files.last();
-//		}
-//		else
-//		{
-//			work = files[power];
-//		}
-//
-//#define AGGL_THR 2
-//
-//		if ( work.pow == 0 )
-//		{
-//			if ( power - work.pow < AGGL_THR )
-//			{
-//				// Draw lines
-//				glNewList ( dispList, GL_COMPILE );
-//				glBegin ( GL_LINE_STRIP );
-//				for ( qint64 i = ( MAX ( begin, 0 ) ); i < ( MIN ( end, NoSamples ) ); i++ )
-//				{
-//					double xcoord = ( double ) ( ( i - begin ) >>power );
-//					double ycoord = ( ( double* ) work.mmap ) [i];
-//					glVertex2d ( xcoord, ycoord );
-//
-//#ifdef COUNT_TILES
-//					vertexCount++;
-//					lineCount++;
-//#endif // COUNT_TILES
-//
-//				}
-//				glEnd();
-//				glEndList();
-//			}
-//			else
-//			{
-//				// Draw bars
-//				glNewList ( dispList, GL_COMPILE );
-//				glBegin ( GL_LINES );
-//				double oldmin = DoubleNaN;
-//				double oldmax = DoubleNaN;
-//				qint64 loopbegin = MAX ( ( begin >> power ) << power, 0 );
-//				qint64 loopend = MIN ( ( end >> power ) << power, NoSamples );
-//				qint64 jbegin = MAX ( begin - loopbegin, 0 );
-//				for ( qint64 i = loopbegin; i < loopend; i = i + ( ( qint64 ) 1<<power ) )
-//				{
-//					double minvalue = DoubleInfinity;
-//					double maxvalue = -DoubleInfinity;
-//					for ( qint64 j = ( i==loopbegin ) ?jbegin:0; ( j < ( ( qint64 ) 1<<power ) ) && ( i+j < loopend ); j++ )
-//					{
-//						if ( ( ( double* ) work.mmap ) [i+j] < minvalue )
-//						{
-//							minvalue = ( ( double* ) work.mmap ) [i+j];
-//						}
-//						if ( ( ( double* ) work.mmap ) [i+j] > maxvalue )
-//						{
-//							maxvalue = ( ( double* ) work.mmap ) [i+j];
-//						}
-//					}
-//
-//					// Comparison with NaN always yields false, so the initial
-//					// comparison should be handled correctly
-//					if ( minvalue >= oldmax || maxvalue <= oldmin )
-//					{
-//						glVertex2d ( ( i-1 + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power,
-//								( oldmin + oldmax ) / 2.0 );
-//						glVertex2d ( ( i + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power,
-//								( minvalue + maxvalue ) / 2.0 );
-//
-//#ifdef COUNT_TILES
-//						vertexCount += 2;
-//						lineCount++;
-//#endif // COUNT_TILES
-//
-//					}
-//					glVertex2d ( ( i + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power,
-//							minvalue );
-//					glVertex2d ( ( i + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power,
-//							maxvalue );
-//
-//#ifdef COUNT_TILES
-//					vertexCount += 2;
-//					lineCount++;
-//#endif // COUNT_TILES
-//
-//					oldmin = minvalue;
-//					oldmax = maxvalue;
-//				}
-//				glEnd();
-//				glEndList();
-//			}
-//		}
-//		else
-//		{
-//			// Draw bars
-//			glNewList ( dispList, GL_COMPILE );
-//			glBegin ( GL_LINES );
-//
-//			double oldmin = DoubleNaN;
-//			double oldmax = DoubleNaN;
-//
-//			qint64 loopbegin = MAX ( ( begin >> power ) << ( power-work.pow ), 0 );
-//			qint64 loopend = MIN ( ( end >> power ) << ( power-work.pow ), NoSamples >> work.pow );
-//			qint64 jbegin = MAX ( ( begin >> work.pow ) - loopbegin, 0 );
-//			for ( qint64 i = loopbegin; i < loopend; i += ( ( qint64 ) 1<< ( power-work.pow ) ) )
-//			{
-//				double minvalue = DoubleInfinity;
-//				double maxvalue = -DoubleInfinity;
-//				for ( qint64 j = ( i==loopbegin ) ?jbegin:0;
-//						( j < ( ( qint64 ) 1<< ( power-work.pow ) ) ) &&
-//								( ( i+j ) < loopend );
-//						j++ )
-//				{
-//					if ( ( ( double* ) work.mmap ) [ ( i+j ) <<1] < minvalue )
-//					{
-//						minvalue = ( ( double* ) work.mmap ) [ ( i+j ) <<1];
-//					}
-//					if ( ( ( double* ) work.mmap ) [ ( ( i+j ) <<1 ) +1] > maxvalue )
-//					{
-//						maxvalue = ( ( double* ) work.mmap ) [ ( ( i+j ) <<1 ) +1];
-//					}
-//				}
-//
-//				// Comparison with NaN always yields false, so the initial
-//				// comparison should be handled correctly
-//
-//				if ( minvalue >= oldmax || maxvalue <= oldmin )
-//				{
-//					glVertex2d ( ( ( i<<work.pow )-1 + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power, ( oldmin + oldmax ) / 2.0 );
-//					glVertex2d ( ( ( i<<work.pow ) + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power, ( minvalue + maxvalue ) / 2.0 );
-//
-//#ifdef COUNT_TILES
-//					vertexCount += 2;
-//					lineCount++;
-//#endif // COUNT_TILES
-//
-//				}
-//
-//				glVertex2d ( ( ( i<<work.pow ) + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power, minvalue );
-//				glVertex2d ( ( ( i<<work.pow ) + ( ( qint64 ) 1<< ( power-1 ) ) - begin ) >> power, maxvalue );
-//
-//#ifdef COUNT_TILES
-//				vertexCount += 2;
-//				lineCount++;
-//#endif // COUNT_TILES
-//
-//				oldmin = minvalue;
-//				oldmax = maxvalue;
-//			}
-//
-//			glEnd();
-//			glEndList();
-//		}
-//
-//		GLenum err = glGetError();
-//		if ( err != GL_NO_ERROR )
-//		{
-//			cout << "GLPlotLoader: " << gluErrorString ( err ) << endl;
-//		}
-//
-//#if defined(COUNT_TILES) && !defined(BENCHMARK)
-//		qDebug() << "TimeSeriesPlotLoader: generated" << vertexCount << "vertexes and" << lineCount << "lines.";
-//#endif // COUNT_TILES
-//
-//#if defined(BENCHMARK) && defined(COUNT_TILES)
-//		benchmarkHelper::vertexCount = vertexCount;
-//		benchmarkHelper::lineCount = lineCount;
-//		benchmarkHelper::quadCount = 0;
-//#endif // BENCHCOUNT
-//
-//		done = true;
-//
-//		emit notifyListUpdate();
-//	}
-//}
-
-//void TimeSeriesPlotLoader::stop()
-//{
-//	stopThread = true;
-//	ctrlWait.wakeAll();
-//	wait();
-//}
-
 qint64 TimeSeriesPlotLoader::getXMin()
 {
 	return 0;
@@ -779,4 +421,3 @@ qint64 TimeSeriesPlotLoader::getXMax()
 	return NoSamples;
 }
 
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

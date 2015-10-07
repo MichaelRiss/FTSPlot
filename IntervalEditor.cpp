@@ -24,9 +24,13 @@
 #include "IntervalEditor.h"
 #include "DeleteCursorData.xbm"
 
+#if defined(BENCHMARK) && defined(COUNT_TILES)
+#include "benchmarks/benchmarkHelper.h"
+#endif
+
 using namespace FTSPlot;
 
-IntervalEditor::IntervalEditor ( SimpleViewWidget* plotWidget )
+IntervalEditor::IntervalEditor ( FTSPlotWidget* plotWidget )
 {
     gui = new HideNotifyWidget;
     ui.setupUi ( gui );
@@ -74,13 +78,26 @@ IntervalEditor::IntervalEditor ( SimpleViewWidget* plotWidget )
     gui->setAttribute ( Qt::WA_QuitOnClose, false );
     gui->show();
 
-    svw = plotWidget;
-    ill = new IntervalListLoader ( svw->context() );
+    GLCanvas = plotWidget;
+    ill = new IntervalListLoader();
     workerThread = new QThread( this );
     ill->moveToThread( workerThread );
 
-    connect ( ill, SIGNAL ( notifyListUpdate() ),
-              this, SLOT ( threadDone() ) );
+
+    useList = -1;
+    genList = -1;
+    // reserve two displaylists
+    GLCanvas->makeCurrent();
+    displayLists[0] = glGenLists( 1 );
+    displayLists[1] = glGenLists( 1 );
+    if ( displayLists[0] == 0 || displayLists[1] == 0 )
+    {
+    	qDebug() << "Error: Cannot reserve display list. Exiting.";
+    	exit(1);
+    }
+
+    connect ( ill, SIGNAL ( notifyListUpdate( displaylistdata<double>*, displaylistdata<double>* ) ),
+              this, SLOT ( receiveListUpdate( displaylistdata<double>*, displaylistdata<double>* ) ) );
     connect ( this, SIGNAL ( requestDisplayList ( qint64,qint64,int,QString,double,double ) ),
               ill, SLOT ( genDisplayList ( qint64,qint64,int,QString,double,double ) ) );
 
@@ -108,11 +125,19 @@ IntervalEditor::IntervalEditor ( SimpleViewWidget* plotWidget )
 IntervalEditor::~IntervalEditor()
 {
     // disconnect some signals to avoid stupid accidents
-    disconnect ( ill, SIGNAL ( notifyListUpdate() ), this, SLOT ( threadDone() ) );
+    disconnect ( ill, SIGNAL ( notifyListUpdate( displaylistdata<double>*, displaylistdata<double>* ) ),
+    		this, SLOT ( receiveListUpdate( displaylistdata<double>*, displaylistdata<double>* ) ) );
     // stop & delete thread
+    workerThread->quit();
+    workerThread->wait();
+    delete ( workerThread );
     delete ( ill );
     // delete gui widget
     delete ( gui );
+    // delete displayLists
+    GLCanvas->makeCurrent();
+    glDeleteLists( displayLists[1], 1 );
+    glDeleteLists( displayLists[0], 1 );
 }
 
 
@@ -120,8 +145,10 @@ void IntervalEditor::paintGL()
 {
     if ( state == normal )
     {
-        svw->makeCurrent();
-        ill->paintGL();
+    	if ( useList != -1 )
+    	{
+    		glCallList( displayLists[useList] );
+    	}
     }
 
     if ( firstPointSet )
@@ -184,12 +211,23 @@ void IntervalEditor::genDisplayList ( qint64 reqXdataBeginArg, qint64 reqXdataEn
     reqXdataBegin = reqXdataBeginArg;
     reqDisplayPower = reqDispPowerArg;
 
+    // use right displaylist
+    if ( useList == 1 || useList == -1 )
+    {
+    	genList = 0;
+    }
+    else
+    {
+    	genList = 1;
+    }
+
     emit requestDisplayList ( reqXdataBegin, reqXdataEndArg, reqDispPowerArg, path, ymin, ymax );
 }
 
 void IntervalEditor::toggleLists()
 {
-    ill->toggleLists();
+    useList = genList;
+    genList = -1;
     XdataBegin = reqXdataBegin;
     displayPower = reqDisplayPower;
 }
@@ -207,10 +245,10 @@ double IntervalEditor::getMax()
 bool IntervalEditor::isOverInterval()
 {
     // Get screen coordinates
-    int mouseX = svw->mapFromGlobal( QCursor::pos() ).x();
+    int mouseX = GLCanvas->mapFromGlobal( QCursor::pos() ).x();
     // convert them +/- 1 to graph coordinates
-    qint64 xlow = qMax( ( qint64 ) round ( svw->Xscreen2graph ( mouseX - 1 ) ), Q_INT64_C( 0 ) );
-    qint64 xhigh = ( qint64 ) round ( svw->Xscreen2graph ( mouseX + 1 ) );
+    qint64 xlow = qMax( ( qint64 ) round ( GLCanvas->Xscreen2graph ( mouseX - 1 ) ), Q_INT64_C( 0 ) );
+    qint64 xhigh = ( qint64 ) round ( GLCanvas->Xscreen2graph ( mouseX + 1 ) );
 
     Interval dummy;
     bool overInterval;
@@ -230,7 +268,7 @@ void IntervalEditor::mouseMoveEvent ( QMouseEvent* eventArg )
 {
     if ( ui.addIntervalButton->isChecked() && firstPointSet )
     {
-        currentPoint = svw->Xscreen2graph ( eventArg->x() );
+        currentPoint = GLCanvas->Xscreen2graph ( eventArg->x() );
         emit triggerRepaint ( this );
     }
     if ( eventArg->modifiers() == Qt::ShiftModifier )
@@ -238,9 +276,9 @@ void IntervalEditor::mouseMoveEvent ( QMouseEvent* eventArg )
         // if add mode
         if ( ui.addIntervalButton-> isChecked() )
         {
-            if ( svw->cursor().shape() != Qt::CrossCursor )
+            if ( GLCanvas->cursor().shape() != Qt::CrossCursor )
             {
-                svw->setCursor ( Qt::CrossCursor );
+                GLCanvas->setCursor ( Qt::CrossCursor );
             }
         }
         // if select mode
@@ -248,14 +286,14 @@ void IntervalEditor::mouseMoveEvent ( QMouseEvent* eventArg )
         {
             bool overInterval = isOverInterval();
 
-            if ( overInterval && svw->cursor().shape() != Qt::PointingHandCursor )
+            if ( overInterval && GLCanvas->cursor().shape() != Qt::PointingHandCursor )
             {
-                svw->setCursor ( Qt::PointingHandCursor );
+                GLCanvas->setCursor ( Qt::PointingHandCursor );
             }
 
-            if ( !overInterval && svw->cursor().shape() != Qt::CrossCursor )
+            if ( !overInterval && GLCanvas->cursor().shape() != Qt::CrossCursor )
             {
-                svw->setCursor ( Qt::CrossCursor );
+                GLCanvas->setCursor ( Qt::CrossCursor );
             }
         }
 
@@ -264,23 +302,23 @@ void IntervalEditor::mouseMoveEvent ( QMouseEvent* eventArg )
         {
             bool overInterval = isOverInterval();
 
-            if ( overInterval && svw->cursor().shape() != Qt::BitmapCursor )
+            if ( overInterval && GLCanvas->cursor().shape() != Qt::BitmapCursor )
             {
-                svw->setCursor ( DeleteCursor );
+                GLCanvas->setCursor ( DeleteCursor );
             }
             
-            if ( !overInterval && svw->cursor().shape() != Qt::CrossCursor )
+            if ( !overInterval && GLCanvas->cursor().shape() != Qt::CrossCursor )
             {
-                svw->setCursor ( Qt::CrossCursor );
+                GLCanvas->setCursor ( Qt::CrossCursor );
             }
         }
         eventArg->accept();
     }
     else
     {
-        if ( svw->cursor().shape() != Qt::ArrowCursor )
+        if ( GLCanvas->cursor().shape() != Qt::ArrowCursor )
         {
-            svw->setCursor ( Qt::ArrowCursor );
+            GLCanvas->setCursor ( Qt::ArrowCursor );
         }
         eventArg->ignore();
     }
@@ -292,7 +330,7 @@ void IntervalEditor::mousePressEvent ( QMouseEvent* eventArg )
     {
         if ( ui.addIntervalButton->isChecked() )
         {
-            qint64 xpos = ( qint64 ) round ( svw->Xscreen2graph ( eventArg->x() ) );
+            qint64 xpos = ( qint64 ) round ( GLCanvas->Xscreen2graph ( eventArg->x() ) );
             if ( !firstPointSet )
             {
                 // so this is the first point we have to set
@@ -327,22 +365,22 @@ void IntervalEditor::mousePressEvent ( QMouseEvent* eventArg )
             // convert them +/- 1 to graph coordinates
 
             quint64 xlow;
-            if ( round ( svw->Xscreen2graph ( screenx - 1 ) ) < 0 )
+            if ( round ( GLCanvas->Xscreen2graph ( screenx - 1 ) ) < 0 )
             {
                 xlow = 0;
             }
             else
             {
-                xlow = ( quint64 ) round ( svw->Xscreen2graph ( screenx - 1 ) );
+                xlow = ( quint64 ) round ( GLCanvas->Xscreen2graph ( screenx - 1 ) );
             }
             quint64 xhigh;
-            if ( round ( svw->Xscreen2graph ( screenx + 1 ) ) < 0 )
+            if ( round ( GLCanvas->Xscreen2graph ( screenx + 1 ) ) < 0 )
             {
                 xhigh = 0;
             }
             else
             {
-                xhigh = ( quint64 ) round ( svw->Xscreen2graph ( screenx + 1 ) );
+                xhigh = ( quint64 ) round ( GLCanvas->Xscreen2graph ( screenx + 1 ) );
             }
 
             // check this interval for events
@@ -362,8 +400,8 @@ void IntervalEditor::mousePressEvent ( QMouseEvent* eventArg )
             // Get screen coordinates
             int screenx = eventArg->x();
             // convert them +/- 1 to graph coordinates
-            qint64 xlow = ( qint64 ) round ( svw->Xscreen2graph ( screenx - 1 ) );
-            qint64 xhigh = ( qint64 ) round ( svw->Xscreen2graph ( screenx + 1 ) );
+            qint64 xlow = ( qint64 ) round ( GLCanvas->Xscreen2graph ( screenx - 1 ) );
+            qint64 xhigh = ( qint64 ) round ( GLCanvas->Xscreen2graph ( screenx + 1 ) );
             // check this interval for events - linear for now
 
             Interval toDelete;
@@ -397,20 +435,20 @@ void IntervalEditor::keyPressEvent ( QKeyEvent* eventArg )
         {
             if ( ui.addIntervalButton->isChecked() )
             {
-                svw->setCursor( Qt::CrossCursor );
+                GLCanvas->setCursor( Qt::CrossCursor );
             }
             if ( ui.selectIntervalButton->isChecked() )
             {
-                svw->setCursor( Qt::PointingHandCursor );
+                GLCanvas->setCursor( Qt::PointingHandCursor );
             }
             if ( ui.delIntervalButton->isChecked() )
             {
-                svw->setCursor( DeleteCursor );
+                GLCanvas->setCursor( DeleteCursor );
             }
         }
         else
         {
-            svw->setCursor ( Qt::CrossCursor );
+            GLCanvas->setCursor ( Qt::CrossCursor );
         }
         eventArg->accept();
     }
@@ -424,7 +462,7 @@ void IntervalEditor::keyReleaseEvent ( QKeyEvent* eventArg )
 {
     if ( eventArg->key() == Qt::Key_Shift )
     {
-        svw->setCursor ( Qt::ArrowCursor );
+        GLCanvas->setCursor ( Qt::ArrowCursor );
         eventArg->accept();
     }
     else
@@ -439,7 +477,6 @@ void IntervalEditor::setColor ( QColor color )
     red = myColor.redF();
     green = myColor.greenF();
     blue = myColor.blueF();
-    ill->setColor ( color );
     emit triggerRepaint( this );
 }
 
@@ -508,9 +545,9 @@ bool IntervalEditor::openTreeDir ( QString TreeDirPath )
                  this, SLOT ( openIntervalList() ) );
     connect ( ui.openIntervalListButton, SIGNAL ( clicked() ),
               this, SLOT ( closeIntervalList() ) );
-    originalModuleName = svw->getModuleName( this );
+    originalModuleName = GLCanvas->getModuleName( this );
     QFileInfo intervalListBaseDir( intervalListDirName );
-    if( !svw->setModuleName( this, intervalListBaseDir.baseName() ) )
+    if( !GLCanvas->setModuleName( this, intervalListBaseDir.baseName() ) )
     {
         qDebug() << "Cannot set module name.";
     }
@@ -555,7 +592,7 @@ void IntervalEditor::closeIntervalList()
                  this, SLOT ( closeIntervalList() ) );
     connect ( ui.openIntervalListButton, SIGNAL ( clicked() ),
               this, SLOT ( openIntervalList() ) );
-    if( !svw->setModuleName( this, originalModuleName ) )
+    if( !GLCanvas->setModuleName( this, originalModuleName ) )
     {
         qDebug() << "Cannot reset module name.";
     }
@@ -886,15 +923,6 @@ bool IntervalEditor::importFlatFileMain ( QString flatFileName ) throw ( QString
                         break;
                     }
                 }
-                
-/*                for ( int i = lowBlockMaskIdx+1; i < TOTALHEIGHT+2; i++ )
-                {
-                    if ( !blockCache[i].empty() )
-                    {
-                        lowBlockMaskIdx = i;
-                        break;
-                    }
-                }*/
             }
         }
 
@@ -1255,8 +1283,71 @@ void IntervalEditor::updateGUI()
     }
 }
 
-void IntervalEditor::threadDone()
+void IntervalEditor::receiveListUpdate( displaylistdata<double>* BoxList, displaylistdata<double>* LineList )
 {
+	// check context
+	if( !GLCanvas->isValid() ){
+		qDebug() << "IntervalEditor::receiceListUpdate(): GLCanvas is not valid, exiting.";
+		return;
+	}
+
+	// make current
+	GLCanvas->makeCurrent();
+
+#ifdef COUNT_TILES
+	qint64 vertexCount = 0;
+	qint64 lineCount = 0;
+	qint64 quadCount = 0;
+#endif // COUNT_TILES
+
+	// upload displaylist
+	glNewList ( displayLists[genList], GL_COMPILE );
+
+	// Boxes
+	glColor4f ( red, green, blue, 0.5 );
+	glBegin ( BoxList->drawtype );
+	Q_ASSERT( BoxList->maxIdx % 2 == 0 );
+	for( int i = 0; i < BoxList->maxIdx/2; i++ ){
+		glVertex2d( BoxList->data[2*i], BoxList->data[2*i+1] );
+	}
+	glEnd();
+
+#ifdef COUNT_TILES
+	vertexCount += BoxList->maxIdx / 2;
+	quadCount += BoxList->maxIdx / 8;
+#endif // COUNT_TILES
+
+	// Lines
+	glColor4f ( red, green, blue, 1.0 );
+	glBegin ( LineList->drawtype );
+	Q_ASSERT( LineList->maxIdx % 2 == 0 );
+	for( int i = 0; i < LineList->maxIdx/2; i++ ){
+		glVertex2d( LineList->data[2*i], LineList->data[2*i+1] );
+	}
+	glEnd();
+
+#ifdef COUNT_TILES
+	vertexCount += LineList->maxIdx / 2;
+	lineCount += LineList->maxIdx / 4;
+#endif // COUNT_TILES
+
+	glEndList();
+
+#if defined(COUNT_TILES) && !defined(BENCHMARK)
+	qDebug() << "IntervalEditorLoader: generated" << vertexCount << "vertexes and" << lineCount << "lines and" << quadCount << "quads.";
+#endif // COUNT_TILES
+
+#if defined(BENCHMARK) && defined(COUNT_TILES)
+	benchmarkHelper::vertexCount = vertexCount;
+	benchmarkHelper::lineCount = lineCount;
+	benchmarkHelper::quadCount = quadCount;
+
+	//benchmarkHelper::BoxArray = BoxArray;
+	//benchmarkHelper::LineArray = LineArray;
+	benchmarkHelper::BoxList = *BoxList;
+	benchmarkHelper::LineList = *LineList;
+#endif
+
     emit notifyListUpdate ( this );
 }
 
@@ -1326,7 +1417,8 @@ bool IntervalEditor::addInterval ( Interval inter )
             return false;
         }
 
-        for ( quint64 i = blockFile.size() / sizeof ( Interval ) - 1; i >= 0 ; i-- )
+        quint64 upperlimit = blockFile.size() / sizeof ( Interval );
+        for ( quint64 i = upperlimit-1; i < upperlimit ; i-- )
         {
             if ( bufPtr[i] == inter )
             {
@@ -1825,9 +1917,7 @@ bool IntervalEditor::isEmpty()
 
 bool IntervalEditor::hasNextInterval ( Interval inter )
 {
-    //QVector<Interval> vec;
     Interval nextInter;
-    //return searchNextInterval_sub ( inter, nextInter, true, treeRootDirName, vec, TOTALHEIGHT );
     return searchNextInterval_sub ( inter, nextInter, true, treeRootDirName, TOTALHEIGHT );
 }
 
@@ -1840,9 +1930,7 @@ bool IntervalEditor::hasPrevInterval ( Interval inter )
 
 Interval IntervalEditor::nextInterval ( Interval inter ) throw (bool)
 {
-    //QVector<Interval> vec;
     Interval nextInter;
-    //if ( searchNextInterval_sub ( inter, nextInter, true, treeRootDirName, vec, TOTALHEIGHT ) )
     if ( searchNextInterval_sub ( inter, nextInter, true, treeRootDirName, TOTALHEIGHT ) )  
     {
         return nextInter;
@@ -1855,7 +1943,6 @@ Interval IntervalEditor::nextInterval ( Interval inter ) throw (bool)
 
 Interval IntervalEditor::prevInterval ( Interval inter ) throw (bool )
 {
-    QVector<Interval> vec;
     Interval prevInter;
     if ( searchPrevInterval ( inter, prevInter ) )
     {
@@ -1873,8 +1960,6 @@ bool IntervalEditor::searchNextInterval ( Interval inter, Interval& nextInter )
     // 2 phases firstDescent true/false
     // in first descent we try to find the given interval
     // in the second phase we try to search the next interval
-    //QVector<Interval> vec;
-    //bool result =  searchNextInterval_sub ( inter, nextInter, true, treeRootDirName, vec, TOTALHEIGHT );
     bool result =  searchNextInterval_sub ( inter, nextInter, true, treeRootDirName, TOTALHEIGHT );
     return result;
 }
@@ -2331,8 +2416,6 @@ void IntervalEditor::lowerMinusHandler()
     newCurrent.begin = newBegin;
     // del interval
     delInterval ( currentInterval );
-    // wait until the event loop is ready again
-    //ill->eventLoopAlive();
     // add interval
     addInterval ( newCurrent );
     currentInterval = newCurrent;
@@ -2354,8 +2437,6 @@ void IntervalEditor::lowerPlusHandler()
     newCurrent.begin = newBegin;
     // del interval
     delInterval ( currentInterval );
-    // wait until the event loop is ready again
-    //ill->eventLoopAlive();
     // add interval
     addInterval ( newCurrent );
     currentInterval = newCurrent;
@@ -2377,8 +2458,6 @@ void IntervalEditor::upperMinusHandler()
     newCurrent.end = newEnd;
     // del interval
     delInterval ( currentInterval );
-    // wait until the event loop is ready again
-    //ill->eventLoopAlive();
     // add interval
     addInterval ( newCurrent );
     currentInterval = newCurrent;
@@ -2400,8 +2479,6 @@ void IntervalEditor::upperPlusHandler()
     newCurrent.end = newEnd;
     // del interval
     delInterval ( currentInterval );
-    // wait until the event loop is ready again
-    //ill->eventLoopAlive();
     // add interval
     addInterval ( newCurrent );
     currentInterval = newCurrent;
@@ -2462,7 +2539,6 @@ void IntervalEditor::handleFineTuneLow ( )
             Interval newCurrent = currentInterval;
             newCurrent.begin = value;
             delInterval ( currentInterval );
-            //ill->eventLoopAlive();
             addInterval ( newCurrent );
             currentInterval = newCurrent;
             updateGUI();
@@ -2494,7 +2570,6 @@ void IntervalEditor::handleFineTuneHigh ( )
             Interval newCurrent = currentInterval;
             newCurrent.end = value;
             delInterval ( currentInterval );
-            //ill->eventLoopAlive();
             addInterval ( newCurrent );
             currentInterval = newCurrent;
             updateGUI();
@@ -2608,5 +2683,3 @@ int IntervalEditor::interval2height( Interval inter )
     return height;
 }
 
-
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

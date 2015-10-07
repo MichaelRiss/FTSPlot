@@ -42,7 +42,7 @@
          </widget>
         </item>
         <item>
-         <widget class="FTSPlot::SimpleViewWidget" name="MySimpleViewWidget" native="true">
+         <widget class="FTSPlot::FTSPlotWidget" name="MyFTSPlotWidget" native="true">
           <property name="locale">
            <locale language="English" country="UnitedStates"/>
           </property>
@@ -59,7 +59,16 @@
          </size>
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item row="0" column="0">
@@ -145,9 +154,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>FTSPlot::SimpleViewWidget</class>
+   <class>FTSPlot::FTSPlotWidget</class>
    <extends>QWidget</extends>
-   <header>SimpleViewWidget.h</header>
+   <header>FTSPlotWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

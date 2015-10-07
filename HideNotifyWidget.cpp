@@ -29,5 +29,3 @@ void HideNotifyWidget::hideEvent(QHideEvent* )
 {
     emit GUIupdate();
 }
-
-//#include "HideNotifyWidget.moc"

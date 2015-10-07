@@ -18,13 +18,14 @@
 
 #include <math.h>
 #include "XScaleBar.h"
+#include <QPainter>
 
 #define MAX(a,b) a<b?b:a
 
 using namespace FTSPlot;
 
 XScaleBar::XScaleBar( QWidget* parent )
-        : QGLWidget( parent )
+        : QOpenGLWidget( parent )
 {
     qtminDeltaticks = 3;
     Xcursor = 0;
@@ -40,6 +41,7 @@ XScaleBar::XScaleBar( QWidget* parent )
 
 void XScaleBar::initializeGL()
 {
+	initializeOpenGLFunctions();
     glClearColor(1.0, 1.0, 1.0, 0.0);
     glShadeModel(GL_FLAT);
     glEnable( GL_LINE_SMOOTH );
@@ -57,11 +59,13 @@ void XScaleBar::resizeGL ( int width, int height )
     glViewport(0, 0, (GLint)width, (GLint)height);
     glMatrixMode ( GL_PROJECTION );
     glLoadIdentity ();
+    // TODO: replace with non GLU function
     gluOrtho2D( 0.0, (double) width, (double) height, 0 );
 }
 
 void XScaleBar::paintGL()
 {
+	QPainter painter(this);
     glClear ( GL_COLOR_BUFFER_BIT );
 
     glColor3f ( 0.0, 0.0, 0.0 );
@@ -117,7 +121,7 @@ void XScaleBar::paintGL()
     for ( long double idx = XStart; idx <= XEnd; idx += powl(10, power+1) )
     {
         qtlabelbuffer = QString::number( idx, 'f', 0 );
-        renderText( data2screen(idx) - fm->width( qtlabelbuffer ) / 2, 20, qtlabelbuffer, fixedFont );
+        painter.drawText( data2screen(idx) - fm->width( qtlabelbuffer ) / 2, 20, qtlabelbuffer );
     }
 
     glFlush();
@@ -162,4 +166,3 @@ void XScaleBar::setNewXmax( long double Xmax )
     update();
 }
 
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

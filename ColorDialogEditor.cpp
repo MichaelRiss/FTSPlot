@@ -31,7 +31,6 @@ ColorDialogEditor::ColorDialogEditor(QWidget *parent) :
 
 QColor ColorDialogEditor::color() const
 {
-    //return qVariantValue<QColor>(currentColor());
     return currentColor();
 }
 
@@ -40,6 +39,3 @@ void ColorDialogEditor::setColor(QColor color)
 {
     setCurrentColor( color );
 }
-
-
-//#include "ColorDialogEditor.moc"

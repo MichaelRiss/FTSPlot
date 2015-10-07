@@ -19,8 +19,9 @@
 #ifndef INTERVALEDITORTEST_H
 #define INTERVALEDITORTEST_H
 
+#include <FTSPlotWidget.h>
+
 #include <QtTest/QTest>
-#include "SimpleViewWidget.h"
 #include "IntervalEditor.h"
 
 using namespace FTSPlot;
@@ -30,7 +31,7 @@ class IntervalEditorTest : public QObject
     Q_OBJECT
 
 private:
-    SimpleViewWidget* tsplot;
+    FTSPlotWidget* tsplot;
     GL_Layer* ieModule;
 private slots:
     void initTestCase();
@@ -39,4 +40,3 @@ private slots:
 };
 
 #endif // INTERVALEDITORTEST_H
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

@@ -19,8 +19,9 @@
 #ifndef YRANGETEST_H
 #define YRANGETEST_H
 
+#include <FTSPlotWidget.h>
+
 #include <QtTest/QTest>
-#include "SimpleViewWidget.h"
 
 using namespace FTSPlot;
 
@@ -29,7 +30,7 @@ class YRangeTest : public QObject
   Q_OBJECT
   
 private:
-    SimpleViewWidget* tsplot;
+    FTSPlotWidget* tsplot;
     GL_Layer* tsModule;
 private slots:
     void initTestCase();

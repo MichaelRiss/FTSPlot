@@ -137,5 +137,3 @@ bool GL_Layer::GUIvisible()
     return false;
 }
 
-
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 

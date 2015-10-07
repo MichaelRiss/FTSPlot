@@ -19,11 +19,12 @@
 #ifndef FTSPLOTBENCHMAINWINDOW_H
 #define FTSPLOTBENCHMAINWINDOW_H
 
+#include <FTSPlotWidget.h>
+
 #include <QMainWindow>
 #include <QTextStream>
 #include <QFile>
 #include "ui_FTSPlotBenchMainWindow.h"
-#include "SimpleViewWidget.h"
 #include "TimeSeriesPlot.h"
 #include "EventEditor.h"
 #include "IntervalEditor.h"
@@ -37,7 +38,7 @@ public:
     FTSPlotBenchMainWindow(QWidget* parent = 0, Qt::WindowFlags flags = 0);
 private:
     Ui::MainWindow ui;
-    SimpleViewWidget* sView;
+    FTSPlotWidget* sView;
     TimeSeriesPlot* tsModule;
     EventEditor* EventModule;
     IntervalEditor* IntervalModule;
@@ -90,4 +91,3 @@ public slots:
 };
 
 #endif // FTSPLOTBENCHMAINWINDOW_H
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

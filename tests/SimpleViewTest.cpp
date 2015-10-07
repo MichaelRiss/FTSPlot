@@ -24,7 +24,7 @@ void SimpleViewTest::initTestCase()
     Myparent = new QWidget();
     QVERIFY( Myparent != NULL );
     Myparent->show();
-    testWidget = new SimpleViewWidget( Myparent );
+    testWidget = new FTSPlotWidget( Myparent );
     QVERIFY ( testWidget != NULL );
 }
 
@@ -36,4 +36,3 @@ void SimpleViewTest::cleanupTestCase()
 }
 
 #include "SimpleViewTest.moc"
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 

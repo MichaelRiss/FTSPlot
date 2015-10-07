@@ -23,9 +23,9 @@
 #include <iostream>
 #include <stdio.h>
 #include <errno.h>
+#include <FTSPlotWidget.h>
 #include <cmath>
 #include "commonDefs.h"
-#include "SimpleViewWidget.h"
 #include "EventEditor.h"
 #include "IntervalEditor.h"
 #include "TimeSeriesPlot.h"
@@ -41,11 +41,11 @@ using namespace FTSPlot;
 #define QINT64_MIN LLONG_MIN
 
 
-Qt::GlobalColor SimpleViewWidget::stdColors[] = { Qt::black, Qt::red, Qt::green, Qt::blue, Qt::magenta, Qt::cyan,
+Qt::GlobalColor FTSPlotWidget::stdColors[] = { Qt::black, Qt::red, Qt::green, Qt::blue, Qt::magenta, Qt::cyan,
         Qt::darkYellow, Qt::darkGray
                                                 };
 
-SimpleViewWidget::SimpleViewWidget ( QWidget* parent ) :
+FTSPlotWidget::FTSPlotWidget ( QWidget* parent ) :
         QOpenGLWidget ( parent ), svm ( this )
 {
     windowWidth = 0;
@@ -77,7 +77,7 @@ SimpleViewWidget::SimpleViewWidget ( QWidget* parent ) :
     IntervalListCounter = 0;
 }
 
-SimpleViewWidget::~SimpleViewWidget()
+FTSPlotWidget::~FTSPlotWidget()
 {
     for ( int i = modules.size() - 1; i >= 0; i-- )
     {
@@ -85,9 +85,9 @@ SimpleViewWidget::~SimpleViewWidget()
     }
 }
 
-void SimpleViewWidget::initializeGL()
+void FTSPlotWidget::initializeGL()
 {
-	qDebug() << "SimpleViewWidget::initializeGL() called.";
+	initializeOpenGLFunctions();
     glClearColor ( 1.0, 1.0, 1.0, 1.0 );
     glShadeModel ( GL_FLAT );
 
@@ -96,11 +96,10 @@ void SimpleViewWidget::initializeGL()
     glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glHint ( GL_LINE_SMOOTH_HINT, GL_DONT_CARE );
     glLineWidth ( 1.0 );
-    qDebug() << "SimpleViewWidget::initializeGL() completed.";
 }
 
 
-void SimpleViewWidget::resizeGL ( int w, int h )
+void FTSPlotWidget::resizeGL ( int w, int h )
 {
     if ( w == 0 || h == 0 )
     {
@@ -117,7 +116,7 @@ void SimpleViewWidget::resizeGL ( int w, int h )
 }
 
 
-void SimpleViewWidget::setupViewportProjection()
+void FTSPlotWidget::setupViewportProjection()
 {
     makeCurrent();
     // Left and right window edges in graph coordinates
@@ -137,9 +136,9 @@ void SimpleViewWidget::setupViewportProjection()
 }
 
 
-void SimpleViewWidget::paintGL()
+void FTSPlotWidget::paintGL()
 {
-    if ( changeDispListSet )
+	if ( changeDispListSet )
     {
         useList.clear();
         for ( int i = 0; i < vizList.size(); i++ )
@@ -235,10 +234,9 @@ void SimpleViewWidget::paintGL()
     {
         qDebug() << "SimpleViewWidget paintGL: " << gluErrorString ( err );
     }
-    qDebug() << "paintGL called.";
 }
 
-void SimpleViewWidget::mousePressEvent ( QMouseEvent* event )
+void FTSPlotWidget::mousePressEvent ( QMouseEvent* event )
 {
     if ( activeInputModule )
     {
@@ -258,8 +256,7 @@ void SimpleViewWidget::mousePressEvent ( QMouseEvent* event )
     event->accept();
 }
 
-
-void SimpleViewWidget::requestNewLists()
+void FTSPlotWidget::requestNewLists()
 {
     if ( !requested )
     {
@@ -300,7 +297,7 @@ void SimpleViewWidget::requestNewLists()
     }
 }
 
-void SimpleViewWidget::requestNewList ( GL_Layer* mod )
+void FTSPlotWidget::requestNewList ( GL_Layer* mod )
 {
     // This is the routine to update a single Layer
     if ( !vizList.contains ( mod ) )
@@ -322,7 +319,7 @@ void SimpleViewWidget::requestNewList ( GL_Layer* mod )
 }
 
 
-void SimpleViewWidget::mouseMoveEvent ( QMouseEvent* event )
+void FTSPlotWidget::mouseMoveEvent ( QMouseEvent* event )
 {
     if ( activeInputModule )
     {
@@ -348,7 +345,6 @@ void SimpleViewWidget::mouseMoveEvent ( QMouseEvent* event )
             Ymin = Ymin += dy * Yscale;
             Ymax = Ymax += dy * Yscale;
 
-            //makeCurrent();
             setupViewportProjection();
             update();
             emit ( newCoords ( Xcursor, Xscale, Ymin, Ymax ) );
@@ -361,7 +357,6 @@ void SimpleViewWidget::mouseMoveEvent ( QMouseEvent* event )
 
             Xcursor -= ( double ) dx * Xscale;
 
-            //makeCurrent();
             setupViewportProjection();
             update();
             emit ( newCoords ( Xcursor, Xscale, Ymin, Ymax ) );
@@ -374,31 +369,31 @@ void SimpleViewWidget::mouseMoveEvent ( QMouseEvent* event )
     QString message;
     message = message + QString::number ( ( qint64 ) crossHairX ) + ", "
               + QString::number ( crossHairY );
-    qDebug() << "writeCrossCoords emitted: " << message;
     emit writeCrossCoords ( message, 0 );
+    event->accept();
 }
 
 
-long double SimpleViewWidget::Xscreen2graph ( int x )
+long double FTSPlotWidget::Xscreen2graph ( int x )
 {
     long double result = Xcursor + ( double ) ( x ) * Xscale;
     return result;
 }
 
-double SimpleViewWidget::Yscreen2graph ( int y )
+double FTSPlotWidget::Yscreen2graph ( int y )
 {
     double result = Ymax - ( ( double ) y / ( double ) windowHeight * ( Ymax - Ymin ) );
     return result;
 }
 
-double SimpleViewWidget::Xgraph2GL ( long double x )
+double FTSPlotWidget::Xgraph2GL ( long double x )
 {
     double result = ( x - XdataBegin ) / ( 1<<dispPower );
     return result;
 }
 
 
-void SimpleViewWidget::wheelEvent ( QWheelEvent *event )
+void FTSPlotWidget::wheelEvent ( QWheelEvent *event )
 {
     if ( activeInputModule )
     {
@@ -464,7 +459,7 @@ void SimpleViewWidget::wheelEvent ( QWheelEvent *event )
 }
 
 
-void SimpleViewWidget::enterEvent ( QEvent * event )
+void FTSPlotWidget::enterEvent ( QEvent * event )
 {
     if ( activeInputModule )
     {
@@ -480,7 +475,7 @@ void SimpleViewWidget::enterEvent ( QEvent * event )
     event->ignore();
 }
 
-void SimpleViewWidget::leaveEvent ( QEvent * event )
+void FTSPlotWidget::leaveEvent ( QEvent * event )
 {
     if ( activeInputModule )
     {
@@ -494,7 +489,7 @@ void SimpleViewWidget::leaveEvent ( QEvent * event )
     emit clearCrossCoords();
 }
 
-void SimpleViewWidget::keyPressEvent ( QKeyEvent * event )
+void FTSPlotWidget::keyPressEvent ( QKeyEvent * event )
 {
     if ( activeInputModule )
     {
@@ -506,7 +501,7 @@ void SimpleViewWidget::keyPressEvent ( QKeyEvent * event )
     }
 }
 
-void SimpleViewWidget::keyReleaseEvent ( QKeyEvent * event )
+void FTSPlotWidget::keyReleaseEvent ( QKeyEvent * event )
 {
     if ( activeInputModule )
     {
@@ -519,8 +514,12 @@ void SimpleViewWidget::keyReleaseEvent ( QKeyEvent * event )
 }
 
 
-GL_Layer* SimpleViewWidget::addTimeSeries ( QString cfgFileName )
+GL_Layer* FTSPlotWidget::addTimeSeries ( QString cfgFileName )
 {
+	if( !context()->isValid() ){
+		qDebug() << "SimpleViewWidget::addTimeSeries: context invalid, exiting. Make sure to \"show\" the SimpleViewWidget before adding modules.";
+		exit(1);
+	}
     TimeSeriesPlot* newTS = new TimeSeriesPlot ( this );
     if ( !newTS->openFile ( cfgFileName ) )
     {
@@ -548,7 +547,7 @@ GL_Layer* SimpleViewWidget::addTimeSeries ( QString cfgFileName )
 }
 
 
-void SimpleViewWidget::addTimeSeries()
+void FTSPlotWidget::addTimeSeries()
 {
     bool failureOccurred = false;
     
@@ -584,8 +583,13 @@ void SimpleViewWidget::addTimeSeries()
     return;
 }
 
-GL_Layer* SimpleViewWidget::genEventEditor()
+GL_Layer* FTSPlotWidget::genEventEditor()
 {
+	if( !context()->isValid() ){
+		qDebug() << "SimpleViewWidget::genEventEditor: context invalid, exiting. Make sure to \"show\" the SimpleViewWidget before adding modules.";
+		exit(1);
+	}
+
     EventEditor* ed = new EventEditor ( this );
     vizModule tmp;
     tmp.module = ed;
@@ -609,7 +613,7 @@ GL_Layer* SimpleViewWidget::genEventEditor()
 }
 
 
-GL_Layer* SimpleViewWidget::addEventEditorModule ( QString TreeDirName )
+GL_Layer* FTSPlotWidget::addEventEditorModule ( QString TreeDirName )
 {
     EventEditor* ed = ( EventEditor* ) genEventEditor();
     ed->openTreeDir ( TreeDirName );
@@ -617,13 +621,18 @@ GL_Layer* SimpleViewWidget::addEventEditorModule ( QString TreeDirName )
 }
 
 
-void SimpleViewWidget::addEventEditor()
+void FTSPlotWidget::addEventEditor()
 {
     genEventEditor();
 }
 
-GL_Layer* SimpleViewWidget::genIntervalEditor()
+GL_Layer* FTSPlotWidget::genIntervalEditor()
 {
+	if( !context()->isValid() ){
+		qDebug() << "SimpleViewWidget::genIntervalEditor: context invalid, exiting. Make sure to \"show\" the SimpleViewWidget before adding modules.";
+		exit(1);
+	}
+
     IntervalEditor* id = new IntervalEditor ( this );
     vizModule tmp;
     tmp.module = id;
@@ -648,7 +657,7 @@ GL_Layer* SimpleViewWidget::genIntervalEditor()
     return id;
 }
 
-GL_Layer* SimpleViewWidget::addIntervalEditorModule ( QString TreeDirName )
+GL_Layer* FTSPlotWidget::addIntervalEditorModule ( QString TreeDirName )
 {
     IntervalEditor* id = ( IntervalEditor* ) genIntervalEditor();
     id->openTreeDir ( TreeDirName );
@@ -656,17 +665,17 @@ GL_Layer* SimpleViewWidget::addIntervalEditorModule ( QString TreeDirName )
 }
 
 
-void SimpleViewWidget::addIntervalEditor()
+void FTSPlotWidget::addIntervalEditor()
 {
     genIntervalEditor();
 }
 
-QList< vizModule > SimpleViewWidget::listModules()
+QList< vizModule > FTSPlotWidget::listModules()
 {
     return modules;
 }
 
-bool SimpleViewWidget::deleteModule ( GL_Layer* mod )
+bool FTSPlotWidget::deleteModule ( GL_Layer* mod )
 {
     // search module entry
     bool success = false;
@@ -690,7 +699,7 @@ bool SimpleViewWidget::deleteModule ( GL_Layer* mod )
     return true;
 }
 
-bool SimpleViewWidget::showModule ( GL_Layer* mod )
+bool FTSPlotWidget::showModule ( GL_Layer* mod )
 {
     // search module entry
     bool success = false;
@@ -714,7 +723,7 @@ bool SimpleViewWidget::showModule ( GL_Layer* mod )
     return true;
 }
 
-QString SimpleViewWidget::getModuleName(GL_Layer* mod)
+QString FTSPlotWidget::getModuleName(GL_Layer* mod)
 {
     // search module entry
     bool success = false;
@@ -738,7 +747,7 @@ QString SimpleViewWidget::getModuleName(GL_Layer* mod)
     return result;
 }
 
-bool SimpleViewWidget::setModuleName(GL_Layer* mod, QString name)
+bool FTSPlotWidget::setModuleName(GL_Layer* mod, QString name)
 {
     // search module entry
     bool success = false;
@@ -763,7 +772,7 @@ bool SimpleViewWidget::setModuleName(GL_Layer* mod, QString name)
 }
 
 
-bool SimpleViewWidget::hideModule ( GL_Layer* mod )
+bool FTSPlotWidget::hideModule ( GL_Layer* mod )
 {
     // search module entry
     bool success = false;
@@ -787,7 +796,7 @@ bool SimpleViewWidget::hideModule ( GL_Layer* mod )
     return true;
 }
 
-bool SimpleViewWidget::isModuleVisible ( GL_Layer* mod )
+bool FTSPlotWidget::isModuleVisible ( GL_Layer* mod )
 {
     // search module entry
     bool success = false;
@@ -810,7 +819,7 @@ bool SimpleViewWidget::isModuleVisible ( GL_Layer* mod )
     return modules[idx].visible;
 }
 
-bool SimpleViewWidget::showModuleGUI(GL_Layer* mod)
+bool FTSPlotWidget::showModuleGUI(GL_Layer* mod)
 {
     // search module entry
     bool success = false;
@@ -834,7 +843,7 @@ bool SimpleViewWidget::showModuleGUI(GL_Layer* mod)
     return true;
 }
 
-bool SimpleViewWidget::hideModuleGUI(GL_Layer* mod)
+bool FTSPlotWidget::hideModuleGUI(GL_Layer* mod)
 {
     // search module entry
     bool success = false;
@@ -858,7 +867,7 @@ bool SimpleViewWidget::hideModuleGUI(GL_Layer* mod)
     return true;
 }
 
-bool SimpleViewWidget::isModuleGUIVisible(GL_Layer* mod)
+bool FTSPlotWidget::isModuleGUIVisible(GL_Layer* mod)
 {
     // search module entry
     bool success = false;
@@ -882,7 +891,7 @@ bool SimpleViewWidget::isModuleGUIVisible(GL_Layer* mod)
 }
 
 
-QColor SimpleViewWidget::getModuleColor ( GL_Layer* mod )
+QColor FTSPlotWidget::getModuleColor ( GL_Layer* mod )
 {
     // search module entry
     bool success = false;
@@ -906,7 +915,7 @@ QColor SimpleViewWidget::getModuleColor ( GL_Layer* mod )
 }
 
 
-bool SimpleViewWidget::setModuleColor ( GL_Layer* mod, QColor col )
+bool FTSPlotWidget::setModuleColor ( GL_Layer* mod, QColor col )
 {
     // search module entry
     bool success = false;
@@ -930,12 +939,12 @@ bool SimpleViewWidget::setModuleColor ( GL_Layer* mod, QColor col )
     return true;
 }
 
-GL_Layer* SimpleViewWidget::getEditModule()
+GL_Layer* FTSPlotWidget::getEditModule()
 {
     return activeInputModule;
 }
 
-bool SimpleViewWidget::setEditModule ( GL_Layer* mod )
+bool FTSPlotWidget::setEditModule ( GL_Layer* mod )
 {
     // special case mod == NULL
     if ( mod == NULL )
@@ -967,7 +976,7 @@ bool SimpleViewWidget::setEditModule ( GL_Layer* mod )
     return true;
 }
 
-bool SimpleViewWidget::reorderModules ( QList< vizModule > orderedMods )
+bool FTSPlotWidget::reorderModules ( QList< vizModule > orderedMods )
 {
     // first check if it is really just a reordering
     QList<vizModule> tmpOld = modules;
@@ -1004,7 +1013,7 @@ bool SimpleViewWidget::reorderModules ( QList< vizModule > orderedMods )
     return true;
 }
 
-void SimpleViewWidget::registerCompleted ( GL_Layer* module )
+void FTSPlotWidget::registerCompleted ( GL_Layer* module )
 {
     if ( !reqSet.contains ( module ) )
     {
@@ -1022,7 +1031,6 @@ void SimpleViewWidget::registerCompleted ( GL_Layer* module )
         reqList.clear();
         changeDispListSet = true;
         requested = false;
-        //repaint();
 #ifdef BENCHMARK
         struct timespec displayList_endTime;
         clock_gettime( CLOCK_MONOTONIC, &displayList_endTime );
@@ -1034,7 +1042,7 @@ void SimpleViewWidget::registerCompleted ( GL_Layer* module )
     }
 }
 
-void SimpleViewWidget::updateVizList()
+void FTSPlotWidget::updateVizList()
 {
     vizList.clear();
 
@@ -1072,7 +1080,7 @@ void SimpleViewWidget::updateVizList()
     requestNewLists();
 }
 
-void SimpleViewWidget::ExtLayerUpdate ( GL_Layer* mod )
+void FTSPlotWidget::ExtLayerUpdate ( GL_Layer* mod )
 {
     // Here we just record that an external module has
     // requested an update
@@ -1090,12 +1098,12 @@ void SimpleViewWidget::ExtLayerUpdate ( GL_Layer* mod )
     update();
 }
 
-int SimpleViewWidget::getWindowHeight()
+int FTSPlotWidget::getWindowHeight()
 {
     return windowHeight;
 }
 
-void SimpleViewWidget::updateCoords ( long double Xcursor, double Xscale, double Ymin, double Ymax )
+void FTSPlotWidget::updateCoords ( long double Xcursor, double Xscale, double Ymin, double Ymax )
 {
     if ( !is_nan ( Xcursor ) )
         this->Xcursor = Xcursor;
@@ -1110,7 +1118,7 @@ void SimpleViewWidget::updateCoords ( long double Xcursor, double Xscale, double
     update();
 }
 
-void SimpleViewWidget::displaySpot ( long double Xcursor, double Xscale, double Ymin, double Ymax )
+void FTSPlotWidget::displaySpot ( long double Xcursor, double Xscale, double Ymin, double Ymax )
 {
     if ( !is_nan ( Xscale ) )
         this->Xscale = Xscale;
@@ -1126,12 +1134,12 @@ void SimpleViewWidget::displaySpot ( long double Xcursor, double Xscale, double 
     update();
 }
 
-void SimpleViewWidget::setXRange ( long double Xbegin, long double Xend )
+void FTSPlotWidget::setXRange ( long double Xbegin, long double Xend )
 {
     displayRange ( Xbegin, Xend );
 }
 
-QPair< long double, long double > SimpleViewWidget::getXRange()
+QPair< long double, long double > FTSPlotWidget::getXRange()
 {
     long double Xbegin;
     long double Xend;
@@ -1140,7 +1148,7 @@ QPair< long double, long double > SimpleViewWidget::getXRange()
     return QPair<long double, long double> ( Xbegin, Xend );
 }
 
-void SimpleViewWidget::setYRange ( double Ymin, double Ymax )
+void FTSPlotWidget::setYRange ( double Ymin, double Ymax )
 {
     this->Ymin = Ymin;
     this->Ymax = Ymax;
@@ -1149,14 +1157,13 @@ void SimpleViewWidget::setYRange ( double Ymin, double Ymax )
     update();
 }
 
-QPair< double, double > SimpleViewWidget::getYRange()
+QPair< double, double > FTSPlotWidget::getYRange()
 {
     return QPair<double, double> ( Ymin, Ymax );
 }
 
-void SimpleViewWidget::displayRange ( long double begin, long double end )
+void FTSPlotWidget::displayRange ( long double begin, long double end )
 {
-    //cout << "SimpleViewWidget::displayRange ( " << begin << ", " << end  << ")" << endl;
     Xscale = ( end - begin ) / windowWidth;
     Xcursor = begin;
     setupViewportProjection();
@@ -1164,10 +1171,8 @@ void SimpleViewWidget::displayRange ( long double begin, long double end )
     emit newCoords ( Xcursor, Xscale, Ymin, Ymax );
 }
 
-SimpleViewModulesModel* SimpleViewWidget::dataModel()
+FTSPlotModulesModel* FTSPlotWidget::dataModel()
 {
     return &svm;
 }
 
-
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

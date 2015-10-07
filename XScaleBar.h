@@ -21,7 +21,8 @@
 
 #include <iostream>
 #include <sstream>
-#include <QGLWidget>
+#include <QOpenGLFunctions_1_0>
+#include <QOpenGLWidget>
 #if defined(Q_WS_MAC)
 # include <OpenGL/glu.h>
 #else
@@ -38,7 +39,7 @@ using namespace std;
 namespace FTSPlot
 {
 
-class XScaleBar : public QGLWidget
+class XScaleBar : public QOpenGLWidget, protected QOpenGLFunctions_1_0
 {
     Q_OBJECT
 public:

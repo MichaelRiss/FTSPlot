@@ -22,14 +22,6 @@
 #include <cmath>
 #include <iostream>
 #include <QThread>
-#include <QOpenGLContext>
-#if defined(Q_WS_MAC)
-# include <OpenGL/glu.h>
-#else
-# ifndef QT_LINUXBASE
-#  include <GL/glu.h>
-# endif
-#endif
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
@@ -40,32 +32,29 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "mmapFileInfo.h"
+#include <DisplayListData.h>
 
 namespace FTSPlot
 {
     bool isPow2( int a );
     int intlog2( int a );
     
+
+
 class TimeSeriesPlotLoader : public QObject
 {
     Q_OBJECT
 public:
-    TimeSeriesPlotLoader ( QOpenGLContext* context );
+    TimeSeriesPlotLoader ();
     ~TimeSeriesPlotLoader();
     bool openFile ( QString fileName );
-    //void run();
     void stop();
     double getMin();
     double getMax();
     qint64 getXMin();
     qint64 getXMax();
+    displaylistdata<double> dList;
 private:
-    bool initialized;
-    bool initGL();
-    //QGLWidget* glwindow;
-    //QGLWidget* myGLwidget;
-    QOpenGLContext* myGLContext;
-    QSurface* mySurface;
     bool filesready;
     double recordMin;
     double recordMax;
@@ -77,19 +66,14 @@ private:
     qint64 begin;
     qint64 end;
     int power;
-    GLuint reqDispList;
-    //bool newJob;
-    //bool done;
-    //bool stopThread;
-    GLuint dispList;
 public slots:
 	void genDisplayList ( qint64 Xbegin, qint64 Xend,
-                          int reqPower, GLuint displayList );
+                          int reqPower );
 signals:
-    void notifyListUpdate();
+    void notifyListUpdate( displaylistdata<double>* dList );
 };
 
 }
 
 #endif
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+

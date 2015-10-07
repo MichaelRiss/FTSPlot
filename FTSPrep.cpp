@@ -131,11 +131,6 @@ void FTSPrep::run()
             rawFile = false;
             oldfileName.append( "." );
             oldfileName.append( QString::number( currThinFactor ) );
-
-            // open origFile and get file length / sizeof(double)
-
-            // iterate down the reduction files and add up idx lengths
-            // add position to totalidx
         }
 
         // set position
@@ -170,7 +165,6 @@ void FTSPrep::run()
 
             // in the end: add position
             totalidx += position;
-            // done
         }
         idx = position;
         lidx = position % thinFactor;
@@ -384,8 +378,6 @@ void FTSPrep::run()
         // reset indexes
         idx = 0;
         lidx = 0;
-
-        // done
     }
 
 
@@ -421,4 +413,3 @@ void FTSPrep::run()
     threadlock.unlock();
 }
 
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

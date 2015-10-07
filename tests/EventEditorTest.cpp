@@ -30,7 +30,8 @@ void EventEditorTest::initTestCase()
     
     mywidget = new QWidget();
     mywidget->show();
-    tsplot = new SimpleViewWidget ( mywidget );
+    tsplot = new FTSPlotWidget ( mywidget );
+    tsplot->show();
     QVERIFY ( tsplot != NULL );
     QDir testDir( "testData" );
     QVERIFY( testDir.exists() == true );
@@ -54,4 +55,4 @@ void EventEditorTest::createAndDestroyEventEditorModule()
 }
 
 #include "EventEditorTest.moc"
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+

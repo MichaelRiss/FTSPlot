@@ -19,7 +19,7 @@
 #ifndef __TIMESERIESPLOT_H__
 #define __TIMESERIESPLOT_H__
 
-#include "SimpleViewWidget.h"
+#include <FTSPlotWidget.h>
 #include "GL_Layer.h"
 #include "mmapFileInfo.h"
 #include <QThread>
@@ -35,7 +35,7 @@ class TimeSeriesPlot : public GL_Layer
 {
     Q_OBJECT
 public:
-    TimeSeriesPlot( SimpleViewWidget* glwindow );
+    TimeSeriesPlot( FTSPlotWidget* glwindow );
     ~TimeSeriesPlot();
     bool openFile( QString filename );
     double getMin();
@@ -52,7 +52,7 @@ private:
     GLuint displayLists[2];
     int useList;
     int genList;
-    SimpleViewWidget* glwindow;
+    FTSPlotWidget* GLCanvas;
     TimeSeriesPlotLoader* worker;
     QColor myColor;
     GLfloat red;
@@ -61,10 +61,10 @@ private:
     QString fileName;
     QThread* workerThread;
 public slots:
-    void receiceListUpdate();
+    void receiceListUpdate( displaylistdata<double>* );
 signals:
     void requestNewDisplayLists( qint64 Xbegin, qint64 Xend,
-            					 int reqPower, GLuint displayList );
+            					 int reqPower );
     void triggerRepaint();
 };
 

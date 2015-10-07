@@ -19,8 +19,9 @@
 #ifndef SHOWHIDETEST_H
 #define SHOWHIDETEST_H
 
+#include <FTSPlotWidget.h>
+
 #include <QtTest/QTest>
-#include "SimpleViewWidget.h"
 
 using namespace FTSPlot;
 
@@ -29,7 +30,7 @@ class ShowHideTest : public QObject
     Q_OBJECT
 
 private:
-    SimpleViewWidget* tsplot;
+    FTSPlotWidget* tsplot;
     GL_Layer* tsModule;
     GL_Layer* eeModule;
     GL_Layer* ieModule;
@@ -40,4 +41,3 @@ private slots:
 };
 
 #endif // SHOWHIDETEST_H
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 

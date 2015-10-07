@@ -21,7 +21,7 @@
 
 void ModifyColorTest::initTestCase()
 {
-    tsplot = new SimpleViewWidget ( NULL );
+    tsplot = new FTSPlotWidget ( NULL );
     QVERIFY ( tsplot != NULL );
     tsplot->show();
 
@@ -113,4 +113,3 @@ void ModifyColorTest::colorModificationTest()
 
 
 #include "ModifyColorTest.moc"
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

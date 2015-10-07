@@ -19,8 +19,9 @@
 #ifndef EVENTSTEST_H
 #define EVENTSTEST_H
 
+#include <FTSPlotWidget.h>
+
 #include <QtTest/QTest>
-#include "SimpleViewWidget.h"
 #include "EventEditor.h"
 
 using namespace FTSPlot;
@@ -30,7 +31,7 @@ class EventsTest : public QObject
     Q_OBJECT
 
 private:
-    SimpleViewWidget* tsplot;
+    FTSPlotWidget* tsplot;
     EventEditor* eeModule;
 
 private slots:
@@ -41,4 +42,3 @@ private slots:
 };
 
 #endif // EVENTSTEST_H
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

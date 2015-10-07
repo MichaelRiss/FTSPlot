@@ -25,21 +25,21 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <FTSPlotWidget.h>
 #include <math.h>
 #include "TimeSeriesPlot.h"
-#include "SimpleViewWidget.h"
 
 using namespace std;
 using namespace FTSPlot;
 
-TimeSeriesPlot::TimeSeriesPlot( SimpleViewWidget* glwindow ) :
+TimeSeriesPlot::TimeSeriesPlot( FTSPlotWidget* glwindow ) :
 		red(0.0), green(0.0), blue(0.0),
 		workerThread( new QThread() )
 {
     useList = -1;
     genList = -1;
 
-    this->glwindow = glwindow;
+    this->GLCanvas = glwindow;
 
     // reserve two displaylists
     glwindow->makeCurrent();
@@ -47,26 +47,29 @@ TimeSeriesPlot::TimeSeriesPlot( SimpleViewWidget* glwindow ) :
     displayLists[1] = glGenLists( 1 );
     if ( displayLists[0] == 0 || displayLists[1] == 0 )
     {
-        cerr << "Error: Cannot reserve display list. Exiting." << endl;
+        qDebug() << "Error: Cannot reserve display list. Exiting.";
         exit(1);
     }
-    worker = new TimeSeriesPlotLoader( glwindow->context() );
+    worker = new TimeSeriesPlotLoader();
     worker->moveToThread( workerThread );
+    workerThread->start();
     qRegisterMetaType<GLuint>("GLuint");
-    connect( this, SIGNAL(requestNewDisplayLists(qint64, qint64, int, GLuint)),
-    		 worker, SLOT(genDisplayList(qint64, qint64, int, GLuint )) );
-    connect( worker, SIGNAL( notifyListUpdate() ), this, SLOT( receiceListUpdate() ) );
+    qRegisterMetaType<displaylistdata<double>*>("DisplayListData");
+    connect( this, SIGNAL(requestNewDisplayLists(qint64, qint64, int )),
+    		 worker, SLOT(genDisplayList(qint64, qint64, int )) );
+    connect( worker, SIGNAL( notifyListUpdate( displaylistdata<double>* ) ), this, SLOT( receiceListUpdate( displaylistdata<double>* ) ) );
 }
 
 TimeSeriesPlot::~TimeSeriesPlot()
 {
-    disconnect( worker, SIGNAL( notifyListUpdate() ), this, SLOT( receiceListUpdate() ) );
+    disconnect( worker, SIGNAL( notifyListUpdate( displaylistdata<double>* ) ), this, SLOT( receiceListUpdate( displaylistdata<double>* ) ) );
+    workerThread->quit();
     workerThread->wait();
     delete( workerThread );
     delete( worker );
 
     // delete displayLists
-    glwindow->makeCurrent();
+    GLCanvas->makeCurrent();
     glDeleteLists( displayLists[1], 1 );
     glDeleteLists( displayLists[0], 1 );
 }
@@ -111,13 +114,12 @@ void TimeSeriesPlot::genDisplayList( qint64 Xbegin, qint64 Xend, int reqPower, d
     {
         genList = 1;
     }
-    emit requestNewDisplayLists( Xbegin, Xend, reqPower, displayLists[genList] );
-    //worker->genDisplayList( Xbegin, Xend, reqPower, displayLists[genList] );
+    emit requestNewDisplayLists( Xbegin, Xend, reqPower );
 }
 
 void TimeSeriesPlot::toggleLists()
 {
-    // No need for synchronization as we are called synchronosly to
+    // No need for synchronization as we are called synchronously to
     // the SimplePlotWidget paintGL() method
     useList = genList;
     genList = -1;
@@ -132,8 +134,28 @@ void TimeSeriesPlot::paintGL()
     }
 }
 
-void TimeSeriesPlot::receiceListUpdate()
+void TimeSeriesPlot::receiceListUpdate( displaylistdata<double>* dList )
 {
+	// check whether there is a valid GL context
+	if( !GLCanvas->isValid() ){
+		qDebug() << "TimeSeriesPlot::receiceListUpdate(): GLCanvas is not valid, exiting.";
+		return;
+	}
+
+	// make current
+	GLCanvas->makeCurrent();
+
+	// generate displaylist
+	// (hand over a pointer via argument to struct with Type + QVector?)
+	glNewList ( displayLists[genList], GL_COMPILE );
+	glBegin ( dList->drawtype );
+	Q_ASSERT( dList->maxIdx % 2 == 0 );
+	for( int i = 0; i < dList->maxIdx/2; i++ ){
+		glVertex2d( dList->data[2*i], dList->data[2*i+1] );
+	}
+	glEnd();
+	glEndList();
+
     emit notifyListUpdate( this );
 }
 
@@ -145,5 +167,3 @@ qint64 TimeSeriesPlot::getXmax() {
     return worker->getXMax();
 }
 
-
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

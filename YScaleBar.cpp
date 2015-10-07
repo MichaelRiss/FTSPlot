@@ -18,6 +18,7 @@
 
 #include <math.h>
 #include "YScaleBar.h"
+#include <QPainter>
 
 #define MAX(a,b) a<b?b:a
 
@@ -38,6 +39,7 @@ YScaleBar::YScaleBar(QWidget* parent)
 
 void YScaleBar::initializeGL()
 {
+	initializeOpenGLFunctions();
     glClearColor(1.0, 1.0, 1.0, 0.0);
     glShadeModel(GL_FLAT);
     glEnable( GL_LINE_SMOOTH );
@@ -56,11 +58,13 @@ void YScaleBar::resizeGL(int width, int height)
     glViewport(0, 0, (GLint)width, (GLint)height);
     glMatrixMode ( GL_PROJECTION );
     glLoadIdentity ();
+    // TODO: replace with non GLU function
     gluOrtho2D( 0.0, (double) width, 0, (double) height );
 }
 
 void YScaleBar::paintGL()
 {
+	QPainter painter(this);
     glClear ( GL_COLOR_BUFFER_BIT );
 
     glColor3f ( 0.0, 0.0, 0.0 );
@@ -106,7 +110,7 @@ void YScaleBar::paintGL()
         qtlabelbuffer = QString::number( idx, 'f', 10 );
         qtlabelbuffer = QString("%1").arg(idx, 10, 'f', 7);
 
-        renderText( 10, height-data2screen(idx)+4, qtlabelbuffer, fixedFont );
+        painter.drawText( 10, height-data2screen(idx)+4, qtlabelbuffer );
     }
 
     glFlush();
@@ -123,4 +127,3 @@ int YScaleBar::data2screen(double dataCoord) {
     return (dataCoord - Ymin) / (Ymax - Ymin) * height;
 }
 
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

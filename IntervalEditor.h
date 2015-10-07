@@ -19,10 +19,10 @@
 #ifndef INTERVALEDITOR_H
 #define INTERVALEDITOR_H
 
+#include <FTSPlotWidget.h>
 #include <GL_Layer.h>
 #include "ui_IntervalEditorGUI.h"
 #include "IntervalListLoader.h"
-#include "SimpleViewWidget.h"
 #include "GUIstate.h"
 #include "Interval.h"
 #include "HideNotifyWidget.h"
@@ -34,7 +34,7 @@ class IntervalEditor : public GL_Layer
 {
     Q_OBJECT
 public:
-    IntervalEditor ( SimpleViewWidget* plotWidget );
+    IntervalEditor ( FTSPlotWidget* plotWidget );
     ~IntervalEditor();
     void paintGL();
     void genDisplayList ( qint64 reqXdataBeginArg, qint64 reqXdataEndArg, int reqDispPowerArg, double reqYFrustMin, double reqYFrustMax );
@@ -69,6 +69,9 @@ public:
     qint64 getXmax();
 
 private:
+    GLuint displayLists[2];
+    int useList;
+    int genList;
     Ui::IntervalEditorGUI ui;
     HideNotifyWidget* gui;
     QString intervalListDirName;
@@ -84,7 +87,7 @@ private:
     void updateGUI();
     IntervalListLoader* ill;
     QThread* workerThread;
-    SimpleViewWidget* svw;
+    FTSPlotWidget* GLCanvas;
     bool RemoveDirectory ( QDir aDir );
     QString flatFileName;
     bool recursiveTreeExport ( QVector< FTSPlot::Interval >& blockArray, QString currentDirName, QFile& flatFile ) throw (QString);
@@ -108,7 +111,6 @@ private:
     void cleanupDirectories ( QStringList pathList );
     bool isEmpty();
     bool searchNextInterval ( Interval inter, Interval& nextInter );
-    //bool searchNextInterval_sub ( FTSPlot::Interval inter, FTSPlot::Interval& nextInter, bool firstDescent, QString path, QVector< FTSPlot::Interval > vec, int height );
     bool searchNextInterval_sub ( FTSPlot::Interval inter, FTSPlot::Interval& nextInter, bool firstDescent, QString path, int height );
     bool searchPrevInterval ( Interval inter, Interval& prevInter );
     QVector< Interval > searchPrevInterval_sub ( FTSPlot::Interval inter, bool firstDescent, QString path, int height );
@@ -131,7 +133,7 @@ public slots:
     void closeIntervalList();
     void importFlatFileSlot();
     void exportFlatFileSlot();
-    void threadDone();
+    void receiveListUpdate( displaylistdata<double>* BoxList, displaylistdata<double>* LineList );
     void nextIntervalSlot();
     void prevIntervalSlot();
     void manualAddInterval();
@@ -161,4 +163,4 @@ signals:
 }
 
 #endif // INTERVALEDITOR_H
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+

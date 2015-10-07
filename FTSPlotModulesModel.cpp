@@ -16,29 +16,30 @@
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA */
 
 
+#include <FTSPlotModulesModel.h>
+#include <FTSPlotWidget.h>
+
 #include <QDebug>
-#include "SimpleViewModulesModel.h"
-#include "SimpleViewWidget.h"
 
 using namespace FTSPlot;
 
-SimpleViewModulesModel::SimpleViewModulesModel ( SimpleViewWidget* upper ) : QAbstractTableModel ( upper )
+FTSPlotModulesModel::FTSPlotModulesModel ( FTSPlotWidget* upper ) : QAbstractTableModel ( upper )
 {
     dataObject = upper;
 }
 
 
-int SimpleViewModulesModel::rowCount ( const QModelIndex& parent ) const
+int FTSPlotModulesModel::rowCount ( const QModelIndex& parent ) const
 {
     return dataObject->modules.size();
 }
 
-int SimpleViewModulesModel::columnCount ( const QModelIndex& parent ) const
+int FTSPlotModulesModel::columnCount ( const QModelIndex& parent ) const
 {
     return 5;
 }
 
-QVariant SimpleViewModulesModel::data ( const QModelIndex& index, int role ) const
+QVariant FTSPlotModulesModel::data ( const QModelIndex& index, int role ) const
 {
     if ( ( index.row() >= dataObject->modules.size() ) || ( index.column() >= 5 ) )
     {
@@ -96,7 +97,7 @@ QVariant SimpleViewModulesModel::data ( const QModelIndex& index, int role ) con
     return QVariant();
 }
 
-bool SimpleViewModulesModel::setData ( const QModelIndex& index, const QVariant& value, int role )
+bool FTSPlotModulesModel::setData ( const QModelIndex& index, const QVariant& value, int role )
 {
     if ( ( index.row() >= dataObject->modules.size() ) || ( index.column() >= 5 ) )
     {
@@ -163,7 +164,7 @@ bool SimpleViewModulesModel::setData ( const QModelIndex& index, const QVariant&
     return false;
 }
 
-QVariant SimpleViewModulesModel::headerData ( int section, Qt::Orientation orientation, int role ) const
+QVariant FTSPlotModulesModel::headerData ( int section, Qt::Orientation orientation, int role ) const
 {
     if ( ( orientation == Qt::Horizontal ) && ( role == Qt::DisplayRole ) )
     {
@@ -193,7 +194,7 @@ QVariant SimpleViewModulesModel::headerData ( int section, Qt::Orientation orien
     return QVariant();
 }
 
-Qt::ItemFlags SimpleViewModulesModel::flags ( const QModelIndex& index ) const
+Qt::ItemFlags FTSPlotModulesModel::flags ( const QModelIndex& index ) const
 {
     switch ( index.column() )
     {
@@ -234,7 +235,7 @@ Qt::ItemFlags SimpleViewModulesModel::flags ( const QModelIndex& index ) const
     return Qt::NoItemFlags;
 }
 
-bool SimpleViewModulesModel::insertRows ( int position, int rows, const QModelIndex& index )
+bool FTSPlotModulesModel::insertRows ( int position, int rows, const QModelIndex& index )
 {
     if ( position >= dataObject->modules.size() )
     {
@@ -256,7 +257,7 @@ bool SimpleViewModulesModel::insertRows ( int position, int rows, const QModelIn
     return true;
 }
 
-bool SimpleViewModulesModel::removeRows ( int position, int rows, const QModelIndex& index )
+bool FTSPlotModulesModel::removeRows ( int position, int rows, const QModelIndex& index )
 {
     if ( position >= dataObject->modules.size() )
     {
@@ -283,26 +284,26 @@ bool SimpleViewModulesModel::removeRows ( int position, int rows, const QModelIn
     return true;
 }
 
-void SimpleViewModulesModel::append ( vizModule& mod )
+void FTSPlotModulesModel::append ( vizModule& mod )
 {
     beginInsertRows ( QModelIndex(), dataObject->modules.size(), dataObject->modules.size() );
     dataObject->modules.append ( mod );
     endInsertRows();
 }
 
-void SimpleViewModulesModel::prepend ( vizModule& mod )
+void FTSPlotModulesModel::prepend ( vizModule& mod )
 {
     beginInsertRows ( QModelIndex(), 0, 0 );
     dataObject->modules.prepend ( mod );
     endInsertRows();
 }
 
-void SimpleViewModulesModel::GUIupdate()
+void FTSPlotModulesModel::GUIupdate()
 {
     emit dataChanged ( QAbstractItemModel::createIndex ( 0, 1 ), QAbstractItemModel::createIndex ( dataObject->modules.size()-1, 1 ) );
 }
 
-void SimpleViewModulesModel::swapRows ( int first, int second )
+void FTSPlotModulesModel::swapRows ( int first, int second )
 {
     if( first >= 0 && first < dataObject->modules.size() && 
         second >= 0 && second < dataObject->modules.size() )
@@ -314,7 +315,7 @@ void SimpleViewModulesModel::swapRows ( int first, int second )
     }
 }
 
-void SimpleViewModulesModel::deleteModule ( int idx )
+void FTSPlotModulesModel::deleteModule ( int idx )
 {
     // take module out of module list
     vizModule tmp = dataObject->modules[idx];
@@ -329,6 +330,3 @@ void SimpleViewModulesModel::deleteModule ( int idx )
     delete( tmp.module );
     dataObject->updateVizList(); 
 }
-
-
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 

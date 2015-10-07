@@ -1,5 +1,5 @@
 /* FTSPlot - fast time series dataset plotter
-   Copyright (C) 2013  Michael Riss <Michael.Riss@gmail.com>
+   Copyright (C) 2015  Michael Riss <Michael.Riss@gmail.com>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -15,29 +15,51 @@
    License along with this library; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA */
 
+#ifndef DISPLAYLISTDATA_H_
+#define DISPLAYLISTDATA_H_
 
-#ifndef EVENTEDITORTEST_H
-#define EVENTEDITORTEST_H
+#include <GL/gl.h>
+#include <QVector>
 
-#include <QtTest/QTest>
-#include "SimpleViewTest.h"
-#include "EventEditor.h"
-
-using namespace FTSPlot;
-
-class EventEditorTest : public QObject
+namespace FTSPlot
 {
-    Q_OBJECT
 
-private:
-    QWidget* mywidget;
-    FTSPlotWidget* tsplot;
-    GL_Layer* eeModule;
-
-private slots:
-    void initTestCase();
-    void cleanupTestCase();
-    void createAndDestroyEventEditorModule();
+template <class T>
+class displaylistdata {
+public:
+	GLenum drawtype;
+	QVector<T> data;
+	int maxIdx;
+	displaylistdata();
+	void reset();
+	void append( T& );
+	T& operator[](int i);
 };
 
-#endif // EVENTEDITORTEST_H
+template <class T>
+displaylistdata<T>::displaylistdata() : drawtype(GL_LINES), maxIdx(0){
+}
+
+template <class T>
+void displaylistdata<T>::reset(){
+	maxIdx = 0;
+}
+
+template <class T>
+void displaylistdata<T>::append( T& item ){
+	if( maxIdx < data.size() ){
+		data[maxIdx] = item;
+	} else {
+		data.append( item );
+	}
+	maxIdx++;
+}
+
+template <class T>
+T& displaylistdata<T>::operator [](int i){
+	return data[i];
+}
+
+}
+
+#endif /* DISPLAYLISTDATA_H_ */

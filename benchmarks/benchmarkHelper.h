@@ -28,6 +28,7 @@
 #include <QGLWidget>
 #include "mmapFileInfo.h"
 #include "EditorUtils.hpp"
+#include "DisplayListData.h"
 
 namespace FTSPlot
 {
@@ -41,8 +42,8 @@ public:
   static QVector<mmapFileInfo>* filesptr;
 
 #ifdef COUNT_TILES
-  static InlineVec<GLdouble> BoxArray;
-  static InlineVec<GLdouble> LineArray;
+  static displaylistdata<GLdouble> BoxList;
+  static displaylistdata<GLdouble> LineList;
 #endif
 };
 

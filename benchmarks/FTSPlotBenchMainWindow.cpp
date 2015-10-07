@@ -165,7 +165,7 @@ void FTSPlotBenchMainWindow::StarttsBenchmark()
     ui.centralwidget->setDisabled ( true );
 
     // create SimpleView
-    sView = new SimpleViewWidget ( NULL );
+    sView = new FTSPlotWidget ( NULL );
     if ( sView == NULL )
     {
         qDebug() << "Cannot create SimpleViewWidget.";
@@ -271,9 +271,11 @@ void FTSPlotBenchMainWindow::paintDoneSlot()
             {
                 QTextStream BoxListStream;
                 BoxListStream.setDevice( &BoxListFile );
-                for( int i = 0; i < benchmarkHelper::BoxArray.getMaxIdx(); i = i + 2 )
+                //for( int i = 0; i < benchmarkHelper::BoxArray.getMaxIdx(); i = i + 2 )
+                for( int i = 0; i < benchmarkHelper::BoxList.maxIdx; i = i + 8 )
                 {
-                  BoxListStream << benchmarkHelper::BoxArray[i] <<  " " << benchmarkHelper::BoxArray[i+1] << endl;
+                  //BoxListStream << benchmarkHelper::BoxArray[i] <<  " " << benchmarkHelper::BoxArray[i+1] << endl;
+                  BoxListStream << benchmarkHelper::BoxList[i] <<  " " << benchmarkHelper::BoxList[i+4] << endl;
                 }
             }
             
@@ -281,9 +283,11 @@ void FTSPlotBenchMainWindow::paintDoneSlot()
             {
                 QTextStream LineListStream;
                 LineListStream.setDevice( &LineListFile );
-                for( int i = 0; i < benchmarkHelper::LineArray.getMaxIdx(); i++ )
+                //for( int i = 0; i < benchmarkHelper::LineArray.getMaxIdx(); i++ )
+                for( int i = 0; i < benchmarkHelper::LineList.maxIdx; i = i + 4 )
                 {
-                  LineListStream << benchmarkHelper::LineArray[i] << endl;
+                  //LineListStream << benchmarkHelper::LineArray[i] << endl;
+                  LineListStream << benchmarkHelper::LineList[i] << endl;
                 }
             }
             
@@ -508,7 +512,7 @@ void FTSPlotBenchMainWindow::StartEventBenchmark()
     ui.centralwidget->setDisabled ( true );
 
     // create SimpleView
-    sView = new SimpleViewWidget ( NULL );
+    sView = new FTSPlotWidget ( NULL );
     if ( sView == NULL )
     {
         qDebug() << "Cannot create SimpleViewWidget.";
@@ -585,7 +589,7 @@ void FTSPlotBenchMainWindow::StartIntervalBenchmark()
     ui.centralwidget->setDisabled ( true );
 
     // create SimpleView
-    sView = new SimpleViewWidget ( NULL );
+    sView = new FTSPlotWidget ( NULL );
     if ( sView == NULL )
     {
         qDebug() << "Cannot create SimpleViewWidget.";
@@ -663,10 +667,3 @@ void FTSPlotBenchMainWindow::StartIntervalBenchmark()
 
 
 #include "FTSPlotBenchMainWindow.moc"
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 
-
-
-
-
-
-

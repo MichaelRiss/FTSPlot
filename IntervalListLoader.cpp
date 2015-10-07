@@ -21,102 +21,16 @@
 #include <QDir>
 #include "IntervalListLoader.h"
 
-#if defined(BENCHMARK) && defined(COUNT_TILES)
-#include "benchmarks/benchmarkHelper.h"
-#endif
 
 using namespace FTSPlot;
 
-IntervalListLoader::IntervalListLoader ( QOpenGLContext* glcontext ) :
-		red( 0.0 ), green( 0.0 ), blue( 0.0 ),
-		mySurface( glcontext->surface() )
+IntervalListLoader::IntervalListLoader ()
 {
-	//glwidget = parentarg;
-	myGLContext = new QOpenGLContext( this );
-	myGLContext->setFormat( glcontext->format() );
-	myGLContext->setScreen( glcontext->screen() );
-	myGLContext->setShareContext( glcontext->shareContext() );
-	if( !myGLContext->create() ){
-		qDebug() << "Cannot create new context.";
-		exit(1);
-	}
-
-
-	//myGLwidget = new QGLWidget( glwidget->format(), NULL, glwidget );
-//	if ( myGLwidget->format() != glwidget->format() )
-//	{
-//		qDebug() << "IntervalListLoader: Cannot get the same GL context format as main widget. Exiting!";
-//		exit(1);
-//	}
-	if( !QOpenGLContext::areSharing( glcontext, myGLContext ) ){
-		qDebug() << "Sharing didn't work.";
-		exit(1);
-	}
-
-	if( !myGLContext->isValid() ){
-		qDebug() << "Context not valid. Exiting.";
-		exit( 1 );
-	}
-
-	//glwidget->makeCurrent();
-	myGLContext->makeCurrent( mySurface );
-
-
-	// We also have to initialize this OpenGL Context to use alpha blending for example
-	glClearColor ( 1.0, 1.0, 1.0, 1.0 );
-	glShadeModel ( GL_FLAT );
-
-	glEnable ( GL_LINE_SMOOTH );
-	glEnable ( GL_BLEND );
-	glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	glHint ( GL_LINE_SMOOTH_HINT, GL_DONT_CARE );
-	glLineWidth ( 1.0 );
-
-
-	displayLists[0] = glGenLists ( 1 );
-	displayLists[1] = glGenLists ( 1 );
-	if ( displayLists[0] == 0 || displayLists[1] == 0 )
-	{
-		qDebug() << "Error: Cannot reserve display list. Exiting.";
-		exit ( 1 );
-	}
-
-
-	useList = 0;
-	genList = 1;
-	eventLoopTestCounter0 = 0;
-	eventLoopTestCounter1 = 0;
-
-	//connect ( this, SIGNAL ( checkEventLoopSignal ( int ) ), this, SLOT ( checkEventLoop ( int ) ) );
-	//moveToThread ( this );
-	//start();
 }
 
 IntervalListLoader::~IntervalListLoader()
 {
-	//quit();
-	//wait();
-	// delete displaylists
-	//glwidget->makeCurrent();
-	//myGLwidget->makeCurrent();
-	myGLContext->makeCurrent( mySurface );
-	glDeleteLists ( displayLists[1], 1 );
-	glDeleteLists ( displayLists[0], 1 );
-	myGLContext->doneCurrent();
-	//delete( myGLContext ); // Should get deleted by QObject parent-child relation
 }
-
-void IntervalListLoader::paintGL()
-{
-	glCallList ( displayLists[useList] );
-}
-
-//void IntervalListLoader::run()
-//{
-//	myGLwidget->makeCurrent();
-//	exec();
-//	myGLwidget->doneCurrent();
-//}
 
 void IntervalListLoader::genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataEnd, int reqDispPower, QString treeDirName, double ymin, double ymax )
 {
@@ -141,8 +55,10 @@ void IntervalListLoader::genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataE
 
 	// call recursive function
 
-	InlineVec<GLdouble> BoxArray;
-	InlineVec<GLdouble> LineArray;
+	BoxList.reset();
+	BoxList.drawtype = GL_QUADS;
+	LineList.reset();
+	LineList.drawtype = GL_LINES;
 
 	if ( !treeDirName.isEmpty() )
 	{
@@ -173,18 +89,31 @@ void IntervalListLoader::genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataE
 							double xlow = begin;
 							double xhigh = end;
 
-							//qDebug() << "xlow:" << xlow << "xhigh:" << xhigh;
-
 							if ( xlow != xhigh )
 							{
-								BoxArray.append( xlow );
-								BoxArray.append( xhigh );
-								LineArray.append( xlow );
-								LineArray.append( xhigh );
+								BoxList.append( xlow );
+								BoxList.append( ymin );
+								BoxList.append( xhigh );
+								BoxList.append( ymin );
+								BoxList.append( xhigh );
+								BoxList.append( ymax );
+								BoxList.append( xlow );
+								BoxList.append( ymax );
+								LineList.append( xlow );
+								LineList.append( ymin );
+								LineList.append( xlow );
+								LineList.append( ymax );
+								LineList.append( xhigh );
+								LineList.append( ymin );
+								LineList.append( xhigh );
+								LineList.append( ymax );
 							}
 							else
 							{
-								LineArray.append( xlow );
+								LineList.append( xlow );
+								LineList.append( ymin );
+								LineList.append( xlow );
+								LineList.append( ymax );
 							}
 
 							oldBegin = begin;
@@ -197,77 +126,13 @@ void IntervalListLoader::genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataE
 			blockFile.close();
 		}
 
-		getRecursiveEvents ( BoxArray, LineArray, XdataBegin, XdataEnd, treeDirName, 0, reqDispPower, reqXdataBegin, ymin, ymax, TOTALHEIGHT );
+		getRecursiveEvents ( XdataBegin, XdataEnd, treeDirName, 0, reqDispPower, reqXdataBegin, ymin, ymax, TOTALHEIGHT );
 	}
 
-#ifdef COUNT_TILES
-	qint64 vertexCount = 0;
-	qint64 lineCount = 0;
-	qint64 quadCount = 0;
-#endif // COUNT_TILES
-
-
-
-	//myGLwidget->makeCurrent();
-	myGLContext->makeCurrent( mySurface );
-	glNewList ( displayLists[genList], GL_COMPILE );
-
-
-	glColor4f ( red, green, blue, 0.5 );
-	glBegin ( GL_QUADS );
-	for ( long i = 0; i < BoxArray.getMaxIdx(); i += 2 )
-	{
-		glVertex2d ( BoxArray[i], ymin );
-		glVertex2d ( BoxArray[i+1], ymin );
-		glVertex2d ( BoxArray[i+1], ymax );
-		glVertex2d ( BoxArray[i], ymax );
-
-#ifdef COUNT_TILES
-vertexCount += 4;
-quadCount++;
-#endif // COUNT_TILES
-
-	}
-	glEnd();
-
-
-	glColor4f ( red, green, blue, 1.0 );
-	glBegin ( GL_LINES );
-	for ( long i = 0; i < LineArray.getMaxIdx(); i++ )
-	{
-		glVertex2d ( LineArray[i], ymin );
-		glVertex2d ( LineArray[i], ymax );
-
-#ifdef COUNT_TILES
-		vertexCount += 2;
-		lineCount++;
-#endif // COUNT_TILES 
-
-	}
-	glEnd();
-
-
-	glEndList();
-	glFlush();
-
-#if defined(COUNT_TILES) && !defined(BENCHMARK)
-	qDebug() << "IntervalEditorLoader: generated" << vertexCount << "vertexes and" << lineCount << "lines and" << quadCount << "quads.";
-#endif // COUNT_TILES
-
-#if defined(BENCHMARK) && defined(COUNT_TILES)
-	benchmarkHelper::vertexCount = vertexCount;
-	benchmarkHelper::lineCount = lineCount;
-	benchmarkHelper::quadCount = quadCount;
-
-	benchmarkHelper::BoxArray = BoxArray;
-	benchmarkHelper::LineArray = LineArray;
-#endif
-
-
-	emit notifyListUpdate();
+	emit notifyListUpdate( &BoxList, &LineList );
 }
 
-void IntervalListLoader::getRecursiveEvents ( InlineVec<GLdouble>& BoxArray, InlineVec<GLdouble>& LineArray, quint64 beginIdx, quint64 endIdx, QString path, quint64 pathValue, int reqDispPower, qint64 reqXdataBegin, double ymin, double ymax, int height )
+void IntervalListLoader::getRecursiveEvents ( quint64 beginIdx, quint64 endIdx, QString path, quint64 pathValue, int reqDispPower, qint64 reqXdataBegin, double ymin, double ymax, int height )
 {
 	int power = height2NodePower( height );
 	/*
@@ -328,14 +193,29 @@ void IntervalListLoader::getRecursiveEvents ( InlineVec<GLdouble>& BoxArray, Inl
 										double xhigh = end;
 										if ( xlow != xhigh )
 										{
-											BoxArray.append( xlow );
-											BoxArray.append( xhigh );
-											LineArray.append( xlow );
-											LineArray.append( xhigh );
+											BoxList.append( xlow );
+											BoxList.append( ymin );
+											BoxList.append( xhigh );
+											BoxList.append( ymin );
+											BoxList.append( xhigh );
+											BoxList.append( ymax );
+											BoxList.append( xlow );
+											BoxList.append( ymax );
+											LineList.append( xlow );
+											LineList.append( ymin );
+											LineList.append( xlow );
+											LineList.append( ymax );
+											LineList.append( xhigh );
+											LineList.append( ymin );
+											LineList.append( xhigh );
+											LineList.append( ymax );
 										}
 										else
 										{
-											LineArray.append( xlow );
+											LineList.append( xlow );
+											LineList.append( ymin );
+											LineList.append( xlow );
+											LineList.append( ymax );
 										}
 
 										oldBegin = begin;
@@ -364,7 +244,7 @@ void IntervalListLoader::getRecursiveEvents ( InlineVec<GLdouble>& BoxArray, Inl
 			}
 			if ( beginIdx <= sliceValueEnd )
 			{
-				getRecursiveEvents ( BoxArray, LineArray, beginIdx, endIdx, path + "/" + subDirList[i], sliceValueBegin, reqDispPower, reqXdataBegin, ymin, ymax, height-1 );
+				getRecursiveEvents ( beginIdx, endIdx, path + "/" + subDirList[i], sliceValueBegin, reqDispPower, reqXdataBegin, ymin, ymax, height-1 );
 			}
 
 		}
@@ -409,14 +289,29 @@ void IntervalListLoader::getRecursiveEvents ( InlineVec<GLdouble>& BoxArray, Inl
 									double xhigh = end;
 									if ( xlow != xhigh )
 									{
-										BoxArray.append( xlow );
-										BoxArray.append( xhigh );
-										LineArray.append( xlow );
-										LineArray.append( xhigh );
+										BoxList.append( xlow );
+										BoxList.append( ymin );
+										BoxList.append( xhigh );
+										BoxList.append( ymin );
+										BoxList.append( xhigh );
+										BoxList.append( ymax );
+										BoxList.append( xlow );
+										BoxList.append( ymax );
+										LineList.append( xlow );
+										LineList.append( ymin );
+										LineList.append( xlow );
+										LineList.append( ymax );
+										LineList.append( xhigh );
+										LineList.append( ymin );
+										LineList.append( xhigh );
+										LineList.append( ymax );
 									}
 									else
 									{
-										LineArray.append( xlow );
+										LineList.append( xlow );
+										LineList.append( ymin );
+										LineList.append( xlow );
+										LineList.append( ymax );
 									}
 
 									oldBegin = begin;
@@ -460,14 +355,28 @@ void IntervalListLoader::getRecursiveEvents ( InlineVec<GLdouble>& BoxArray, Inl
 
 							if ( xlow != xhigh )
 							{
-								BoxArray.append( xlow );
-								BoxArray.append( xhigh );
-								LineArray.append( xlow );
-								LineArray.append( xhigh );
-							}
+								BoxList.append( xlow );
+								BoxList.append( ymin );
+								BoxList.append( xhigh );
+								BoxList.append( ymin );
+								BoxList.append( xhigh );
+								BoxList.append( ymax );
+								BoxList.append( xlow );
+								BoxList.append( ymax );
+								LineList.append( xlow );
+								LineList.append( ymin );
+								LineList.append( xlow );
+								LineList.append( ymax );
+								LineList.append( xhigh );
+								LineList.append( ymin );
+								LineList.append( xhigh );
+								LineList.append( ymax );							}
 							else
 							{
-								LineArray.append( xlow );
+								LineList.append( xlow );
+								LineList.append( ymin );
+								LineList.append( xlow );
+								LineList.append( ymax );
 							}
 
 							oldBegin = begin;
@@ -482,55 +391,6 @@ void IntervalListLoader::getRecursiveEvents ( InlineVec<GLdouble>& BoxArray, Inl
 	}
 }
 
-void IntervalListLoader::setColor ( QColor color )
-{
-	myColor = color;
-	red = myColor.redF();
-	green = myColor.greenF();
-	blue = myColor.blueF();
-}
-
-void IntervalListLoader::toggleLists()
-{
-	if ( useList == 0 )
-	{
-		useList = 1;
-		genList = 0;
-	}
-	else
-	{
-		useList = 0;
-		genList = 1;
-	}
-}
-
-//void IntervalListLoader::eventLoopAlive()
-//{
-//	int myTicket = ++eventLoopTestCounter0;
-//	emit checkEventLoopSignal ( myTicket );
-//	lock.lock();
-//	while ( eventLoopTestCounter1 != myTicket )
-//	{
-//		waitCond.wait ( &lock );
-//	}
-//	lock.unlock();
-//}
-
-//void IntervalListLoader::checkEventLoop ( int counter )
-//{
-//	lock.lock();
-//	eventLoopTestCounter1 = counter;
-//	waitCond.wakeAll();
-//	lock.unlock();
-//}
-
-//IntervalListLoader_Suspend::IntervalListLoader_Suspend ( IntervalListLoader* lockarg )
-//{
-//	lock = lockarg;
-//	lock->quit();
-//	lock->wait();
-//}
-
 IntervalListLoader_Suspend::IntervalListLoader_Suspend ( QThread* thread )
 {
 	lock = thread;
@@ -542,6 +402,3 @@ IntervalListLoader_Suspend::~IntervalListLoader_Suspend()
 {
 	lock->start();
 }
-
-
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

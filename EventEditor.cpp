@@ -30,7 +30,7 @@
 using namespace std;
 using namespace FTSPlot;
 
-EventEditor::EventEditor ( SimpleViewWidget* plotWidget ) : GL_Layer()
+EventEditor::EventEditor ( FTSPlotWidget* GLCanvas ) : GL_Layer()
 {
     gui = new HideNotifyWidget;
     ui.setupUi ( gui );
@@ -53,14 +53,26 @@ EventEditor::EventEditor ( SimpleViewWidget* plotWidget ) : GL_Layer()
     gui->setAttribute ( Qt::WA_QuitOnClose, false );
     gui->show();
 
-    svw = plotWidget;
-    eel = new EventEditorLoader ( svw->context() );
-    workerThread = new QThread( this );
+    this->GLCanvas = GLCanvas;
+    eel = new EventEditorLoader();
+    workerThread = new QThread();
     eel->moveToThread( workerThread );
+    workerThread->start();
 
+    useList = -1;
+    genList = -1;
+    // reserve two displaylists
+    GLCanvas->makeCurrent();
+    displayLists[0] = glGenLists( 1 );
+    displayLists[1] = glGenLists( 1 );
+    if ( displayLists[0] == 0 || displayLists[1] == 0 )
+    {
+    	qDebug() << "Error: Cannot reserve display list. Exiting.";
+        exit(1);
+    }
 
-    connect ( eel, SIGNAL ( notifyListUpdate() ),
-              this, SLOT ( threadDone() ) );
+    connect ( eel, SIGNAL ( notifyListUpdate( displaylistdata<double>* ) ),
+              this, SLOT ( receiveListUpdate( displaylistdata<double>* ) ) );
     connect ( this, SIGNAL ( requestDisplayList ( qint64,qint64,int,QString,double,double ) ),
               eel, SLOT ( genDisplayList ( qint64,qint64,int,QString,double,double ) ) );
 
@@ -83,11 +95,18 @@ EventEditor::EventEditor ( SimpleViewWidget* plotWidget ) : GL_Layer()
 EventEditor::~EventEditor()
 {
     // disconnect some signals to avoid stupid accidents
-    disconnect ( eel, SIGNAL ( notifyListUpdate() ), this, SLOT ( threadDone() ) );
+    disconnect ( eel, SIGNAL ( notifyListUpdate( displaylistdata<double>* ) ), this, SLOT ( receiveListUpdate( displaylistdata<double>* ) ) );
     // stop & delete thread
+    workerThread->quit();
+    workerThread->wait();
+    delete ( workerThread );
     delete ( eel );
     // delete gui widget
     delete ( gui );
+    // delete displayLists
+    GLCanvas->makeCurrent();
+    glDeleteLists( displayLists[1], 1 );
+    glDeleteLists( displayLists[0], 1 );
 }
 
 
@@ -95,8 +114,11 @@ void EventEditor::paintGL()
 {
     if ( state == normal )
     {
-        svw->makeCurrent();
-        eel->paintGL();
+    	if ( useList != -1 )
+    	{
+    		glColor3f ( red, green, blue );
+    		glCallList( displayLists[useList] );
+    	}
 
         // repaint currentEvent
         double xcoord = ( currentEvent - XdataBegin ) >> displayPower;
@@ -116,6 +138,16 @@ void EventEditor::genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataEnd, int
         path = "";
     }
 
+    // use right displaylist
+    if ( useList == 1 || useList == -1 )
+    {
+    	genList = 0;
+    }
+    else
+    {
+    	genList = 1;
+    }
+
     // get ymin and ymax
     ymin = reqYFrustMin;
     ymax = reqYFrustMax;
@@ -127,7 +159,8 @@ void EventEditor::genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataEnd, int
 
 void EventEditor::toggleLists()
 {
-    eel->toggleLists();
+    useList = genList;
+    genList = -1;
     XdataBegin = reqXdataBegin;
     displayPower = reqDisplayPower;
 }
@@ -145,25 +178,25 @@ double EventEditor::getMax()
 bool EventEditor::isOverEvent()
 {
     // Get screen coordinates
-    int mouseX = svw->mapFromGlobal( QCursor::pos() ).x();
+    int mouseX = GLCanvas->mapFromGlobal( QCursor::pos() ).x();
     // convert them +/- 1 to graph coordinates
     quint64 xlow;
-    if ( round ( svw->Xscreen2graph ( mouseX - 1 ) ) < 0 )
+    if ( round ( GLCanvas->Xscreen2graph ( mouseX - 1 ) ) < 0 )
     {
         xlow = 0;
     }
     else
     {
-        xlow = ( quint64 ) round ( svw->Xscreen2graph ( mouseX - 1 ) );
+        xlow = ( quint64 ) round ( GLCanvas->Xscreen2graph ( mouseX - 1 ) );
     }
     quint64 xhigh;
-    if ( round ( svw->Xscreen2graph ( mouseX + 1 ) ) < 0 )
+    if ( round ( GLCanvas->Xscreen2graph ( mouseX + 1 ) ) < 0 )
     {
         xhigh = 0;
     }
     else
     {
-        xhigh = ( quint64 ) round ( svw->Xscreen2graph ( mouseX + 1 ) );
+        xhigh = ( quint64 ) round ( GLCanvas->Xscreen2graph ( mouseX + 1 ) );
     }
 
     // check this interval for events
@@ -179,9 +212,9 @@ void EventEditor::mouseMoveEvent ( QMouseEvent* event )
         // if add mode
         if ( ui.AddEventButton->isChecked() )
         {
-            if ( svw->cursor().shape() != Qt::CrossCursor )
+            if ( GLCanvas->cursor().shape() != Qt::CrossCursor )
             {
-                svw->setCursor ( Qt::CrossCursor );
+                GLCanvas->setCursor ( Qt::CrossCursor );
             }
         }
         // if select mode
@@ -189,14 +222,14 @@ void EventEditor::mouseMoveEvent ( QMouseEvent* event )
         {
             bool overEvent = isOverEvent();
 
-            if ( overEvent && svw->cursor().shape() != Qt::PointingHandCursor )
+            if ( overEvent && GLCanvas->cursor().shape() != Qt::PointingHandCursor )
             {
-                svw->setCursor ( Qt::PointingHandCursor );
+                GLCanvas->setCursor ( Qt::PointingHandCursor );
             }
 
-            if ( !overEvent && svw->cursor().shape() != Qt::CrossCursor )
+            if ( !overEvent && GLCanvas->cursor().shape() != Qt::CrossCursor )
             {
-                svw->setCursor ( Qt::CrossCursor );
+                GLCanvas->setCursor ( Qt::CrossCursor );
             }
         }
 
@@ -205,14 +238,14 @@ void EventEditor::mouseMoveEvent ( QMouseEvent* event )
         {
             bool overEvent = isOverEvent();
 
-            if ( overEvent && svw->cursor().shape() != Qt::BitmapCursor )
+            if ( overEvent && GLCanvas->cursor().shape() != Qt::BitmapCursor )
             {
-                svw->setCursor ( DeleteCursor );
+                GLCanvas->setCursor ( DeleteCursor );
             }
 
-            if ( !overEvent && svw->cursor().shape() != Qt::CrossCursor )
+            if ( !overEvent && GLCanvas->cursor().shape() != Qt::CrossCursor )
             {
-                svw->setCursor ( Qt::CrossCursor );
+                GLCanvas->setCursor ( Qt::CrossCursor );
             }
         }
         event->accept();
@@ -220,9 +253,9 @@ void EventEditor::mouseMoveEvent ( QMouseEvent* event )
     else
     {
         // reset cursors
-        if ( svw->cursor().shape() != Qt::ArrowCursor )
+        if ( GLCanvas->cursor().shape() != Qt::ArrowCursor )
         {
-            svw->setCursor ( Qt::ArrowCursor );
+            GLCanvas->setCursor ( Qt::ArrowCursor );
         }
         event->ignore();
     }
@@ -237,7 +270,7 @@ void EventEditor::mousePressEvent ( QMouseEvent* event )
 
         if ( ui.AddEventButton->isChecked() )
         {
-            long double xpos = svw->Xscreen2graph ( event->x() );
+            long double xpos = GLCanvas->Xscreen2graph ( event->x() );
             if ( xpos < 0 )
             {
                 addEvent ( 0 );
@@ -254,22 +287,22 @@ void EventEditor::mousePressEvent ( QMouseEvent* event )
             int screenx = event->x();
             // convert them +/- 1 to graph coordinates
             quint64 xlow;
-            if ( round ( svw->Xscreen2graph ( screenx - 1 ) ) < 0 )
+            if ( round ( GLCanvas->Xscreen2graph ( screenx - 1 ) ) < 0 )
             {
                 xlow = 0;
             }
             else
             {
-                xlow = ( quint64 ) round ( svw->Xscreen2graph ( screenx - 1 ) );
+                xlow = ( quint64 ) round ( GLCanvas->Xscreen2graph ( screenx - 1 ) );
             }
             quint64 xhigh;
-            if ( round ( svw->Xscreen2graph ( screenx + 1 ) ) < 0 )
+            if ( round ( GLCanvas->Xscreen2graph ( screenx + 1 ) ) < 0 )
             {
                 xhigh = 0;
             }
             else
             {
-                xhigh = ( quint64 ) round ( svw->Xscreen2graph ( screenx + 1 ) );
+                xhigh = ( quint64 ) round ( GLCanvas->Xscreen2graph ( screenx + 1 ) );
             }
 
             // check this interval for events
@@ -314,22 +347,22 @@ void EventEditor::mousePressEvent ( QMouseEvent* event )
             int screenx = event->x();
             // convert them +/- 1 to graph coordinates
             quint64 xlow;
-            if ( round ( svw->Xscreen2graph ( screenx - 1 ) ) < 0 )
+            if ( round ( GLCanvas->Xscreen2graph ( screenx - 1 ) ) < 0 )
             {
                 xlow = 0;
             }
             else
             {
-                xlow = ( quint64 ) round ( svw->Xscreen2graph ( screenx - 1 ) );
+                xlow = ( quint64 ) round ( GLCanvas->Xscreen2graph ( screenx - 1 ) );
             }
             quint64 xhigh;
-            if ( round ( svw->Xscreen2graph ( screenx + 1 ) ) < 0 )
+            if ( round ( GLCanvas->Xscreen2graph ( screenx + 1 ) ) < 0 )
             {
                 xhigh = 0;
             }
             else
             {
-                xhigh = ( quint64 ) round ( svw->Xscreen2graph ( screenx + 1 ) );
+                xhigh = ( quint64 ) round ( GLCanvas->Xscreen2graph ( screenx + 1 ) );
             }
 
             // check this interval for events
@@ -390,20 +423,20 @@ void EventEditor::keyPressEvent ( QKeyEvent* event )
         {
             if ( ui.AddEventButton->isChecked() )
             {
-                svw->setCursor( Qt::CrossCursor );
+                GLCanvas->setCursor( Qt::CrossCursor );
             }
             if ( ui.SelectEventButton->isChecked() )
             {
-                svw->setCursor( Qt::PointingHandCursor );
+                GLCanvas->setCursor( Qt::PointingHandCursor );
             }
             if ( ui.DeleteEventButton->isChecked() )
             {
-                svw->setCursor( DeleteCursor );
+                GLCanvas->setCursor( DeleteCursor );
             }
         }
         else
         {
-            svw->setCursor ( Qt::CrossCursor );
+            GLCanvas->setCursor ( Qt::CrossCursor );
         }
         event->accept();
     }
@@ -417,7 +450,7 @@ void EventEditor::keyReleaseEvent ( QKeyEvent* event )
 {
     if ( event->key() == Qt::Key_Shift )
     {
-        svw->setCursor ( Qt::ArrowCursor );
+        GLCanvas->setCursor ( Qt::ArrowCursor );
         event->accept();
     }
     else
@@ -432,7 +465,6 @@ void EventEditor::setColor ( QColor color )
     red = myColor.redF();
     green = myColor.greenF();
     blue = myColor.blueF();
-    eel->setColor ( color );
 }
 
 QString EventEditor::getPath()
@@ -610,9 +642,9 @@ bool EventEditor::openTreeDir ( QString EventListDirectory )
                  this, SLOT ( openEventList() ) );
     connect ( ui.openEventListButton, SIGNAL ( clicked() ),
               this, SLOT ( closeEventList() ) );
-    originalModuleName = svw->getModuleName( this );
+    originalModuleName = GLCanvas->getModuleName( this );
     QFileInfo eventListBaseDir( eventListDirName );
-    if( !svw->setModuleName( this, eventListBaseDir.baseName() ) )
+    if( !GLCanvas->setModuleName( this, eventListBaseDir.baseName() ) )
     {
         qDebug() << "Cannot set module name.";
     }
@@ -662,7 +694,7 @@ void EventEditor::closeEventList()
                  this, SLOT ( closeEventList() ) );
     connect ( ui.openEventListButton, SIGNAL ( clicked() ),
               this, SLOT ( openEventList() ) );
-    if( !svw->setModuleName( this, originalModuleName ) )
+    if( !GLCanvas->setModuleName( this, originalModuleName ) )
     {
         qDebug() << "Cannot reset module name.";
     }
@@ -737,7 +769,6 @@ bool EventEditor::importFlatFileMain ( QString flatFileName ) throw ( QString )
     {
         nodeCacheFill[i] = 0;
     }
-    //quint64 dataBuffer[1<<BLOCKFACTOR];
     QScopedPointer<cacheLine> dataBuffer( new cacheLine[1] );
     quint64 dataBufferFill = 0;
     QFile blockFile;
@@ -756,7 +787,6 @@ bool EventEditor::importFlatFileMain ( QString flatFileName ) throw ( QString )
         }
 
         //add value
-        //dataBuffer[dataBufferFill++] = value;
         (*dataBuffer)[dataBufferFill++] = value;
         nodeCache[0][nodeCacheFill[0]++] = value;
         //--
@@ -783,7 +813,6 @@ bool EventEditor::importFlatFileMain ( QString flatFileName ) throw ( QString )
             }
 
             // write out dataBuffer, reset bufferfill, close file
-            //if ( blockFile.write ( ( char* ) dataBuffer, dataBufferFill * sizeof ( quint64 ) ) != dataBufferFill * sizeof ( quint64 ) )
             if ( blockFile.write ( ( char* ) (*dataBuffer), dataBufferFill * sizeof ( quint64 ) ) != dataBufferFill * sizeof ( quint64 ) )
             {
                 throw "Cannot write to " +  blockFile.fileName() + ": " + blockFile.errorString();
@@ -1018,7 +1047,6 @@ bool EventEditor::recursiveTreeExport ( QString currentDirName, QFile& flatFile,
         }
 
         // still in tree => recursive descent
-
         for ( int i = 0; i < subDirList.size(); i++ )
         {
             if ( !recursiveTreeExport ( currentDirName + "/" + subDirList[i], flatFile, height - 1 ) )
@@ -1152,8 +1180,27 @@ QString EventEditor::generatePath(quint64 event, int height, QString suffix)
 }
 
 
-void EventEditor::threadDone()
+void EventEditor::receiveListUpdate( displaylistdata<double>* dList )
 {
+	// check context
+	if( !GLCanvas->isValid() ){
+		qDebug() << "EventEditor::receiceListUpdate(): GLCanvas is not valid, exiting.";
+		return;
+	}
+
+	// make current
+	GLCanvas->makeCurrent();
+
+	// upload displaylist
+	glNewList ( displayLists[genList], GL_COMPILE );
+	glBegin ( dList->drawtype );
+	Q_ASSERT( dList->maxIdx % 2 == 0 );
+	for( int i = 0; i < dList->maxIdx/2; i++ ){
+		glVertex2d( dList->data[2*i], dList->data[2*i+1] );
+	}
+	glEnd();
+	glEndList();
+
     emit notifyListUpdate ( this );
 }
 
@@ -1217,7 +1264,8 @@ bool EventEditor::addEvent ( quint64 xpos )
             return false;
         }
 
-        for ( quint64 i = blockFile.size() / sizeof ( quint64 ) - 1; i >= 0 ; i-- )
+        quint64 limit = blockFile.size() / sizeof ( quint64 ) - 1;
+        for ( quint64 i = limit; i <= limit ; i-- )
         {
             if ( bufPtr[i] == xpos )
             {
@@ -1481,7 +1529,6 @@ bool EventEditor::delEvent_sub ( quint64 xBegin, quint64 xEnd, quint64* deletedE
         QStringList blockFileList = currentDir.entryList ( QDir::NoDotAndDotDot | QDir::Files, QDir::Name );
 
         // still in tree => recursive descent
-
         for ( int i = 0; i < blockFileList.size(); i++ )
         {
             QString coreName = blockFileList[i];
@@ -1531,7 +1578,6 @@ bool EventEditor::delEvent_sub ( quint64 xBegin, quint64 xEnd, quint64* deletedE
         QStringList subDirList = currentDir.entryList ( QDir::NoDotAndDotDot | QDir::Dirs, QDir::Name );
 
         // still in tree => recursive descent
-
         for ( int i = 0; i < subDirList.size(); i++ )
         {
             quint64 sliceValueBegin = dirName2sliceMin( subDirList[i], height-1, pathValue );
@@ -2097,7 +2143,8 @@ bool EventEditor::searchPrevEvent ( bool firstDescent, quint64 event, quint64* p
 
             // Search event and then the next element
             bool foundNewEvent = false;
-            for ( quint64 i = ( blockFile.size() / sizeof ( quint64 ) ) - 1; i >= 0; i-- )
+            quint64 limit = ( blockFile.size() / sizeof ( quint64 ) ) - 1;
+            for ( quint64 i = limit; i <= limit ; i-- )
             {
                 quint64 value = blockData[i];
                 if ( value == event )
@@ -2233,7 +2280,6 @@ void EventEditor::plusEvent()
 {
     quint64 newCurrentEvent = currentEvent+1;
     delEventInRange ( currentEvent, currentEvent );
-    //eel->eventLoopAlive();
 
     addEvent ( newCurrentEvent );
 
@@ -2247,7 +2293,6 @@ void EventEditor::minusEvent()
 {
     quint64 newCurrentEvent = currentEvent-1;
     delEventInRange ( currentEvent, currentEvent );
-    //eel->eventLoopAlive();
 
     addEvent ( newCurrentEvent );
 
@@ -2459,4 +2504,3 @@ inline quint64 EventEditor::value2BlockEnd(quint64 value, int height)
     return value | mask; ;
 }
 
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

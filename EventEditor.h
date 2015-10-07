@@ -33,7 +33,7 @@ class EventEditor : public GL_Layer
 {
     Q_OBJECT
 public:
-    EventEditor ( SimpleViewWidget* plotWidget );
+    EventEditor ( FTSPlotWidget* plotWidget );
     ~EventEditor();
     void paintGL();
     void genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataEnd, int reqDispPower, double reqYFrustMax, double reqYFrustMin );
@@ -68,6 +68,9 @@ public:
     qint64 getXmax();
 
 private:
+    GLuint displayLists[2];
+    int useList;
+    int genList;
     Ui::EventEditorGUI ui;
     HideNotifyWidget* gui;
     QString eventListDirName;
@@ -81,7 +84,7 @@ private:
     QString generatePath( quint64 event, int height, QString suffix = "");
     bool generateNodeFiles ( QString baseDirName, QStringList filePath, QStringList oldPath );
     bool recursiveTreeExport ( QString currentDirName, QFile& flatFile, int height ) throw (QString);
-    SimpleViewWidget* svw;
+    FTSPlotWidget* GLCanvas;
     QCursor DeleteCursor;
     QList<qint64> eventLists[2];
     EventEditorLoader* eel;
@@ -122,7 +125,7 @@ public slots:
     void closeEventList();
     void importFlatFileSlot();
     void exportFlatFileSlot();
-    void threadDone();
+    void receiveListUpdate( displaylistdata<double>* dList );
     void addEventManual();
     void validateManualPosLine ( QString newValue );
     void nextEventSlot();
@@ -143,5 +146,3 @@ signals:
 }
 
 #endif // EVENTEDITOR_H
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
-

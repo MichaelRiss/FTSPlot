@@ -20,18 +20,11 @@
 
 using namespace FTSPlot;
 
-Interval::Interval()
-{
-    begin = 0;
-    end = 1;
-}
-
-Interval::Interval ( quint64 begin = 0, quint64 end = 1 )
+Interval::Interval ( quint64 begin, quint64 end )
 {
     this->begin = begin;
     this->end = end;
 }
-
 
 bool Interval::operator< ( const Interval& other ) const
 {
@@ -68,4 +61,4 @@ QDebug& FTSPlot::operator<< ( QDebug& debug, const Interval& b )
     debug << b.begin << " " << b.end;
     return debug;
 }
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+

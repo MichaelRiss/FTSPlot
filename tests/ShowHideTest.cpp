@@ -20,7 +20,7 @@
 
 void ShowHideTest::initTestCase()
 {
-    tsplot = new SimpleViewWidget ( NULL );
+    tsplot = new FTSPlotWidget ( NULL );
     QVERIFY ( tsplot != NULL );
     tsplot->show();
     

@@ -19,8 +19,9 @@
 #ifndef INTERVALSTEST_H
 #define INTERVALSTEST_H
 
+#include <FTSPlotWidget.h>
+
 #include <QtTest/QTest>
-#include "SimpleViewWidget.h"
 #include "IntervalEditor.h"
 
 using namespace FTSPlot;
@@ -30,7 +31,7 @@ class IntervalsTest : public QObject
   Q_OBJECT
   
 private:
-    SimpleViewWidget* tsplot;
+    FTSPlotWidget* tsplot;
     IntervalEditor* ieModule;
 
 private slots:

@@ -20,7 +20,8 @@
 #define YSCALEBAR_H
 
 #include <iostream>
-#include <QGLWidget>
+#include <QOpenGLFunctions_1_0>
+#include <QOpenGLWidget>
 #if defined(Q_WS_MAC)
 # include <OpenGL/glu.h>
 #else
@@ -35,7 +36,7 @@ using namespace std;
 namespace FTSPlot
 {
 
-class YScaleBar : public QGLWidget
+class YScaleBar : public QOpenGLWidget, protected QOpenGLFunctions_1_0
 {
 Q_OBJECT
 public:

@@ -19,8 +19,9 @@
 #ifndef XRANGETEST_H
 #define XRANGETEST_H
 
+#include <FTSPlotWidget.h>
+
 #include <QtTest/QTest>
-#include "SimpleViewWidget.h"
 
 using namespace FTSPlot;
 
@@ -29,7 +30,7 @@ class XRangeTest : public QObject
     Q_OBJECT
 
 private:
-    SimpleViewWidget* tsplot;
+    FTSPlotWidget* tsplot;
     GL_Layer* tsModule;
 private slots:
     void initTestCase();
@@ -38,4 +39,3 @@ private slots:
 };
 
 #endif // XRANGETEST_H
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

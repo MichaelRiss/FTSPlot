@@ -37,4 +37,3 @@ public:
 }
 
 #endif // COLORDIALOGDELEGATE_H
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 

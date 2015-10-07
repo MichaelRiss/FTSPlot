@@ -27,8 +27,7 @@ namespace FTSPlot
 class Interval
 {
 public:
-    Interval();
-    Interval ( quint64 begin, quint64 end );
+    Interval ( quint64 begin = 0, quint64 end = 1 );
     quint64 begin;
     quint64 end;
     bool operator< ( const Interval & other ) const;
@@ -43,4 +42,4 @@ QDebug& operator<< ( QDebug& debug, const Interval& b );
 }
 
 #endif // INTERVAL_H
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+

@@ -57,4 +57,3 @@ void ColorDialogDelegate::setModelData ( QWidget* editor, QAbstractItemModel* mo
     }
 }
 
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 

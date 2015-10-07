@@ -27,13 +27,6 @@ int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
     
-    // parse command line arguments
-/*    if( app.arguments().contains("--help") || app.arguments().contains("-h") )
-    {
-      qWarning() << "Usage: FTSPrep -th <thinning factor (default 64)> file1 ...";
-      return 0;
-    }*/
-    
     FTSPrep dth;
     FTSPrepGUI foo;
     foo.setDataProcessor( &dth );

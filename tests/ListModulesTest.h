@@ -19,8 +19,9 @@
 #ifndef LISTMODULESTEST_H
 #define LISTMODULESTEST_H
 
+#include <FTSPlotWidget.h>
+
 #include <QtTest/QTest>
-#include "SimpleViewWidget.h"
 #include "TimeSeriesPlot.h"
 #include "EventEditor.h"
 #include "IntervalEditor.h"
@@ -32,7 +33,7 @@ class ListModulesTest : public QObject
     Q_OBJECT
 
 private:
-    SimpleViewWidget* tsplot;
+    FTSPlotWidget* tsplot;
     GL_Layer* tsModule;
     GL_Layer* eeModule;
     GL_Layer* ieModule;
@@ -44,4 +45,3 @@ private slots:
 };
 
 #endif // LISTMODULESTEST_H
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

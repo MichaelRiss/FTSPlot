@@ -19,8 +19,9 @@
 #ifndef TIMESERIESTEST_H
 #define TIMESERIESTEST_H
 
+#include <FTSPlotWidget.h>
+
 #include <QtTest/QTest>
-#include "SimpleViewWidget.h"
 #include "TimeSeriesPlot.h"
 
 using namespace FTSPlot;
@@ -30,7 +31,7 @@ class TimeSeriesPlotTest : public QObject
     Q_OBJECT
     
 private:
-    SimpleViewWidget* tsplot;
+    FTSPlotWidget* tsplot;
     GL_Layer* tsModule;
 
 private slots:
@@ -40,4 +41,3 @@ private slots:
 };
 
 #endif // TIMESERIESTEST_H
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

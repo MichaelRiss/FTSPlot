@@ -22,7 +22,7 @@
 
 void ListModulesTest::initTestCase()
 {
-    tsplot = new SimpleViewWidget ( NULL );
+    tsplot = new FTSPlotWidget ( NULL );
     QVERIFY ( tsplot != NULL );
     tsplot->show();
 }
@@ -97,4 +97,3 @@ void ListModulesTest::runtest()
 
 
 #include "ListModulesTest.moc"
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 

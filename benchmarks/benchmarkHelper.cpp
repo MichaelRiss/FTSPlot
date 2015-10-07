@@ -27,8 +27,7 @@ qint64 benchmarkHelper::quadCount;
 QVector<mmapFileInfo>* benchmarkHelper::filesptr = NULL;
 
 #ifdef COUNT_TILES
-InlineVec<GLdouble> benchmarkHelper::BoxArray;
-InlineVec<GLdouble> benchmarkHelper::LineArray;
+displaylistdata<GLdouble> benchmarkHelper::BoxList;
+displaylistdata<GLdouble> benchmarkHelper::LineList;
 #endif
 }
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

@@ -22,11 +22,12 @@
 namespace FTSPlot
 {
 
-class SimpleViewWidget;
+class FTSPlotWidget;
 
 }
 
 #include <QSet>
+#include <QOpenGLFunctions_1_0>
 #include <QOpenGLWidget>
 #if defined(Q_WS_MAC)
 # include <OpenGL/glu.h>
@@ -49,7 +50,7 @@ class SimpleViewWidget;
 #include <math.h>
 #include <assert.h>
 #include "GL_Layer.h"
-#include "SimpleViewModulesModel.h"
+#include <FTSPlotModulesModel.h>
 
 namespace FTSPlot
 {
@@ -77,18 +78,18 @@ public:
     bool editable;
 };
 
-class SimpleViewWidget : public QOpenGLWidget
+class FTSPlotWidget : public QOpenGLWidget, protected QOpenGLFunctions_1_0
 {
     Q_OBJECT
 
 public:
-    SimpleViewWidget();
-    SimpleViewWidget ( QWidget* parent );
-    ~SimpleViewWidget();
+    FTSPlotWidget();
+    FTSPlotWidget ( QWidget* parent );
+    ~FTSPlotWidget();
     long double Xscreen2graph ( int x );
     double Yscreen2graph ( int y );
     int getWindowHeight();
-    SimpleViewModulesModel* dataModel();
+    FTSPlotModulesModel* dataModel();
     GL_Layer* addTimeSeries ( QString cfgFileName );
     QString cachedTimeSeriesDirectory;
     GL_Layer* addEventEditorModule ( QString TreeDirName );
@@ -126,7 +127,7 @@ protected:
     void leaveEvent ( QEvent * event );
 
 private:
-    friend class SimpleViewModulesModel;
+    friend class FTSPlotModulesModel;
     GL_Layer* activeInputModule;
     void setupViewportProjection();
     void requestNewLists();
@@ -184,7 +185,7 @@ private:
     long double Xmin;
     long double Xmax;
 
-    SimpleViewModulesModel svm;
+    FTSPlotModulesModel svm;
 
     int EventListCounter;
     int IntervalListCounter;
@@ -219,4 +220,4 @@ public slots:
 }
 
 #endif
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 
+

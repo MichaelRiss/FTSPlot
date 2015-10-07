@@ -20,7 +20,7 @@
 
 void IntervalEditorTest::initTestCase()
 {
-    tsplot = new SimpleViewWidget ( NULL );
+    tsplot = new FTSPlotWidget ( NULL );
     QVERIFY ( tsplot != NULL );
     tsplot->show();
     QDir testDir( "testData" );
@@ -45,4 +45,3 @@ void IntervalEditorTest::createAndDestroyIntervalEditorModule()
 
 
 #include "IntervalEditorTest.moc"
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

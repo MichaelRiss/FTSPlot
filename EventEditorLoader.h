@@ -19,9 +19,8 @@
 #ifndef EVENTLISTLOADER_H
 #define EVENTLISTLOADER_H
 
+#include <DisplayListData.h>
 #include <QThread>
-#include <QOpenGLContext>
-#include <QColor>
 #include <QMutex>
 #include <QWaitCondition>
 #include "EditorUtils.hpp"
@@ -34,45 +33,24 @@ class EventEditorLoader : public QObject
 {
     Q_OBJECT
 public:
-    EventEditorLoader ( QOpenGLContext* context = 0 );
+    EventEditorLoader ();
     ~EventEditorLoader();
-    void paintGL();
-    void setColor( QColor color );
-    void toggleLists();
-    //void eventLoopAlive();
-protected:
-    //virtual void run();
+    displaylistdata<double> dList;
 
 private:
-    //QGLWidget* glwidget;
-    QOpenGLContext* myOpenGLContext;
-
-    //QGLWidget* myGLwidget;
-    GLuint displayLists[2];
-    QColor myColor;
-    GLfloat red;
-    GLfloat green;
-    GLfloat blue;
-    int useList;
-    int genList;
-    int eventLoopTestCounter0;
-    int eventLoopTestCounter1;
     void getRecursiveEvents( quint64 beginIdx, quint64 endIdx, QString path, quint64 pathValue, int height, int reqDispPower, qint64 reqXdataBegin, double ymin, double ymax );
-    //QMutex lock;
-    //QWaitCondition waitCond;
 
 #ifdef COUNT_TILES
     qint64 vertexCount;
     qint64 lineCount;
 #endif // COUNT_TILES
     
-signals:
-    void notifyListUpdate();
-    void checkEventLoopSignal( int counter );
-
 public slots:
     void genDisplayList ( qint64 reqXdataBegin, qint64 reqXdataEnd, int reqDispPower, QString baseDirName, double ymin, double ymax );
-    //void checkEventLoop( int counter );
+
+signals:
+	void notifyListUpdate( displaylistdata<double>* dList );
+	void checkEventLoopSignal( int counter );
 };
 
 class EventEditorLoader_Suspend
@@ -88,4 +66,4 @@ private:
 }
 
 #endif // EVENTLISTLOADER_H
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+

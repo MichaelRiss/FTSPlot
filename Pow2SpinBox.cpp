@@ -64,4 +64,3 @@ void Pow2SpinBox::stepBy ( int steps )
     }
 }
 
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 

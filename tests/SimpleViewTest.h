@@ -19,10 +19,11 @@
 #ifndef SIMPLEVIEWTEST_H
 #define SIMPLEVIEWTEST_H
 
+#include <FTSPlotWidget.h>
+
 #include <QtTest/QTest>
 #include <QWidget>
 #include <QDebug>
-#include "SimpleViewWidget.h"
 
 using namespace FTSPlot;
 
@@ -31,7 +32,7 @@ class SimpleViewTest : public QObject
     Q_OBJECT
     
 private:
-    SimpleViewWidget* testWidget;
+    FTSPlotWidget* testWidget;
     QWidget* Myparent;
 private slots:
     void initTestCase();
@@ -39,4 +40,3 @@ private slots:
 };
 
 #endif // SIMPLEVIEWTEST_H
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 

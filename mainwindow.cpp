@@ -23,13 +23,14 @@ MainWindow::MainWindow ( QWidget *parent )
 {
     setupUi ( this );
 
-    connect ( MySimpleViewWidget, SIGNAL ( writeCrossCoords ( const QString &, int ) ),
-              statusBar(), SLOT ( showMessage ( const QString&, int ) ) );
+    connect ( MyFTSPlotWidget, SIGNAL ( writeCrossCoords ( const QString &, int ) ),
+              statusBar(), SLOT ( showMessage ( const QString&, int ) ),
+			  Qt::DirectConnection );
 
-    connect ( MySimpleViewWidget, SIGNAL ( clearCrossCoords() ),
+    connect ( MyFTSPlotWidget, SIGNAL ( clearCrossCoords() ),
               statusBar(), SLOT ( clearMessage() ) );
 
-    connect ( MySimpleViewWidget, SIGNAL ( newCoords ( long double,double,double,double ) ),
+    connect ( MyFTSPlotWidget, SIGNAL ( newCoords ( long double,double,double,double ) ),
               this, SLOT ( updateCoords ( long double,double,double,double ) ) );
 
     connect ( this, SIGNAL ( XscaleUpdate ( long double, double ) ),
@@ -39,19 +40,19 @@ MainWindow::MainWindow ( QWidget *parent )
               MyYScaleBar, SLOT ( updateCoords ( double, double ) ) );
 
     connect ( this, SIGNAL ( GLPlotUpdate ( long double, double, double, double ) ),
-              MySimpleViewWidget, SLOT ( updateCoords ( long double, double, double, double ) ) );
+              MyFTSPlotWidget, SLOT ( updateCoords ( long double, double, double, double ) ) );
 
     // set up the menu widget
     mb.setupUi ( &menuWidget );
     menuWidget.setAttribute ( Qt::WA_QuitOnClose, false );
     connect ( menuToggle, SIGNAL ( clicked() ), this, SLOT ( handleMenu() ) );
     // set up the table
-    mb.moduleList->setModel ( MySimpleViewWidget->dataModel() );
+    mb.moduleList->setModel ( MyFTSPlotWidget->dataModel() );
     mb.moduleList->setItemDelegate ( &myDelegate );
 
-    connect ( mb.AddTimeSeries, SIGNAL ( clicked() ), MySimpleViewWidget, SLOT ( addTimeSeries() ) );
-    connect ( mb.AddEventList, SIGNAL ( clicked() ), MySimpleViewWidget, SLOT ( addEventEditor() ) );
-    connect ( mb.AddIntervalList, SIGNAL ( clicked() ), MySimpleViewWidget, SLOT ( addIntervalEditor() ) );
+    connect ( mb.AddTimeSeries, SIGNAL ( clicked() ), MyFTSPlotWidget, SLOT ( addTimeSeries() ) );
+    connect ( mb.AddEventList, SIGNAL ( clicked() ), MyFTSPlotWidget, SLOT ( addEventEditor() ) );
+    connect ( mb.AddIntervalList, SIGNAL ( clicked() ), MyFTSPlotWidget, SLOT ( addIntervalEditor() ) );
     connect ( mb.moduleList->selectionModel(), SIGNAL ( selectionChanged ( QItemSelection,QItemSelection ) ),
               this, SLOT ( menuBoxSelection ( QItemSelection,QItemSelection ) ) );
     connect ( mb.upButton, SIGNAL ( clicked() ), this, SLOT ( upButtonHandler() ) );
@@ -66,8 +67,6 @@ MainWindow::~MainWindow()
     // This destructor is apparently never called,
     // the necessary tear down code is in 
     // void closeEvent( QCloseEvent* ) function below.
-    
-    //delete( MySimpleViewWidget );
 }
 
 void MainWindow::updateCoords ( long double Xcursor, double Xscale, double Ymin, double Ymax )
@@ -136,7 +135,7 @@ void MainWindow::upButtonHandler()
         return;
     }
 
-    MySimpleViewWidget->dataModel()->swapRows ( idx, idx-1 );
+    MyFTSPlotWidget->dataModel()->swapRows ( idx, idx-1 );
     selectionMutex = true;
     sModel->clearSelection();
     mb.moduleList->selectRow ( idx-1 );
@@ -152,12 +151,12 @@ void MainWindow::downButtonHandler()
     }
 
     int idx = sModel->selectedRows().begin()->row();
-    if ( idx >= MySimpleViewWidget->dataModel()->rowCount()-1 )
+    if ( idx >= MyFTSPlotWidget->dataModel()->rowCount()-1 )
     {
         return;
     }
 
-    MySimpleViewWidget->dataModel()->swapRows ( idx, idx+1 );
+    MyFTSPlotWidget->dataModel()->swapRows ( idx, idx+1 );
     selectionMutex = true;
     sModel->clearSelection();
     mb.moduleList->selectRow ( idx+1 );
@@ -174,15 +173,14 @@ void MainWindow::deleteHandler()
 
     int idx = sModel->selectedRows().begin()->row();
     // disconnect - later
-    MySimpleViewWidget->dataModel()->deleteModule ( idx );
+    MyFTSPlotWidget->dataModel()->deleteModule ( idx );
     // delete - later
 
 }
 
 void MainWindow::closeEvent( QCloseEvent* event )
 {
-    delete( MySimpleViewWidget );
+    delete( MyFTSPlotWidget );
     event->accept();
 }
 
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 

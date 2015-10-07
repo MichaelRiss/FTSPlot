@@ -21,7 +21,7 @@
 
 void EditModuleTest::initTestCase()
 {
-    tsplot = new SimpleViewWidget ( NULL );
+    tsplot = new FTSPlotWidget ( NULL );
     QVERIFY ( tsplot != NULL );
     tsplot->show();
 
@@ -97,4 +97,4 @@ void EditModuleTest::ModuleEditingTest()
 }
 
 #include "EditModuleTest.moc"
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 
+

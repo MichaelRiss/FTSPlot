@@ -37,4 +37,3 @@ typedef struct
 }
 
 #endif /* __mmapFileInfo_h__ */
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 
