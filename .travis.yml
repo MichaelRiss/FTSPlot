@@ -1,0 +1,29 @@
+language: cpp
+os:
+  - linux
+  - osx
+compiler:
+  - gcc
+  - clang
+before_install:
+  - "export DISPLAY=:99.0"
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then (sh -e /etc/init.d/xvfb start); fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then (/opt/X11/bin/Xvfb :99 -ac -screen 0 1280x1024x24 &); fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install qt; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" -a "$CXX" == "g++" ]; then brew unlink gcc; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" -a "$CXX" == "g++" ]; then brew install gcc; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" -a "$CXX" == "g++" ]; then ln -s /usr/local/bin/gcc-5 /usr/local/bin/gcc; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" -a "$CXX" == "g++" ]; then ln -s /usr/local/bin/g++-5 /usr/local/bin/g++; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" -a "$CXX" == "g++" ]; then export PATH="/usr/local/bin:$PATH"; fi
+  
+  
+script:
+  - mkdir build 
+  - cd build 
+  - cmake -DCMAKE_BUILD_TYPE=Release .. 
+  - make
+  - "export DISPLAY=:99.0"
+  - cd tests
+  - ./runTests
+

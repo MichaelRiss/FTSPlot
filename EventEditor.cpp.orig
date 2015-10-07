@@ -1264,9 +1264,14 @@ bool EventEditor::addEvent ( quint64 xpos )
             return false;
         }
 
+<<<<<<< HEAD
+        quint64 limit = blockFile.size() / sizeof ( quint64 ) - 1;
+        for ( quint64 i = limit; i <= limit ; i-- )
+=======
         // the for loop ends once i wraps around from 0 to max qunit64
         quint64 limit = blockFile.size() / sizeof ( quint64 ) - 1;
         for ( quint64 i = limit; i <= limit; i-- )
+>>>>>>> master
         {
             if ( bufPtr[i] == xpos )
             {
@@ -2145,8 +2150,12 @@ bool EventEditor::searchPrevEvent ( bool firstDescent, quint64 event, quint64* p
             // Search event and then the next element
             bool foundNewEvent = false;
             quint64 limit = ( blockFile.size() / sizeof ( quint64 ) ) - 1;
+<<<<<<< HEAD
+            for ( quint64 i = limit; i <= limit ; i-- )
+=======
             // the for loop ends once i wraps around from 0 to max qunit64
             for ( quint64 i = limit; i <= limit; i-- )
+>>>>>>> master
             {
                 quint64 value = blockData[i];
                 if ( value == event )

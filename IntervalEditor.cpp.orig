@@ -1417,9 +1417,14 @@ bool IntervalEditor::addInterval ( Interval inter )
             return false;
         }
 
+<<<<<<< HEAD
+        quint64 upperlimit = blockFile.size() / sizeof ( Interval );
+        for ( quint64 i = upperlimit-1; i < upperlimit ; i-- )
+=======
         // the for loop ends once i wraps around from 0 to max quint64
         quint64 limit = blockFile.size() / sizeof ( Interval ) - 1;
         for ( quint64 i = limit; i <= limit ; i-- )
+>>>>>>> master
         {
             if ( bufPtr[i] == inter )
             {
