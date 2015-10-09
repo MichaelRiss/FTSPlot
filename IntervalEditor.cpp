@@ -82,6 +82,7 @@ IntervalEditor::IntervalEditor ( FTSPlotWidget* plotWidget )
     ill = new IntervalListLoader();
     workerThread = new QThread( this );
     ill->moveToThread( workerThread );
+    workerThread->start();
 
 
     useList = -1;
@@ -1342,8 +1343,6 @@ void IntervalEditor::receiveListUpdate( displaylistdata<double>* BoxList, displa
 	benchmarkHelper::lineCount = lineCount;
 	benchmarkHelper::quadCount = quadCount;
 
-	//benchmarkHelper::BoxArray = BoxArray;
-	//benchmarkHelper::LineArray = LineArray;
 	benchmarkHelper::BoxList = *BoxList;
 	benchmarkHelper::LineList = *LineList;
 #endif

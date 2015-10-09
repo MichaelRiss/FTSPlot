@@ -1,15 +1,11 @@
 project(FTSPlot)
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required( VERSION 3.0.2 )
 find_package(Qt5 COMPONENTS Core Gui Widgets OpenGL)
 find_package(OpenGL REQUIRED)
 
-# set(QT_USE_QTMAIN true)
-# set(QT_USE_QTOPENGL true)
-# INCLUDE(${QT_USE_FILE})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-# include_directories(${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5OpenGL_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR})
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS} ${Qt5Gui_EXECUTABLE_COMPILE_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} ${Qt5OpenGL_EXECUTABLE_COMPILE_FLAGS}")
+
 
 option( LINUX_DISABLE_FILESYSTEMCACHE "When benchmarking on Linux empty the filesystem cache before each test run. You need to be root or have write access to /proc/sys/vm/drop_caches to use this feature." )
 option( COUNT_TILES "Output the number of vertexes, lines and quads generated." )
@@ -21,18 +17,12 @@ set( LINUX_DROP_CACHES_VALUE "3" CACHE STRING "Value that should be written into
 set(FTSPlotLib_SRCS ResizingTableView.cpp HideNotifyWidget.cpp ColorDialogDelegate.cpp Interval.cpp IntervalListLoader.cpp IntervalEditor.cpp 
     EventEditorLoader.cpp EventEditor.cpp YScaleBar.cpp FTSPlotWidget.cpp XScaleBar.cpp TimeSeriesPlot.cpp 
     GL_Layer.cpp TimeSeriesPlotLoader.cpp ColorDialogEditor.cpp FTSPlotModulesModel.cpp)
-# foreach(item ${FTSPlotLib_SRCS})
-#   STRING(REPLACE "cpp" "h" value ${item})
-#   set(FTSPlotLib_HDRS ${FTSPlotLib_HDRS} ${value})
-# endforeach(item)
+
 
 set(FTSPlot_SRCS FTSPlotMain.cpp mainwindow.cpp)
 
 set(FTSPrepLib_SRCS FTSPrep.cpp FTSPrepGUI.cpp Pow2SpinBox.cpp)
-# foreach(item ${FTSPrepLib_SRCS})
-#   STRING(REPLACE "cpp" "h" value ${item})
-#   set(FTSPrepLib_HDRS ${FTSPrepLib_HDRS} ${value})
-# endforeach(item)
+
 set(FTSPrep_SRCS FTSPrepMain.cpp)
 
 set(FTSPlotLib_UI_SRCS FileOpenFailed.ui EventEditorGUI.ui IntervalEditorGUI.ui)
@@ -44,11 +34,7 @@ set(CMAKE_AUTOUIC ON)
 qt5_wrap_ui(FTSPlotLib_UI_HDRS ${FTSPlotLib_UI_SRCS})
 qt5_wrap_ui(FTSPlot_UI_HDRS ${FTSPlot_UI_SRCS})
 qt5_wrap_ui(FTSPrep_UI_HDRS ${FTSPrep_UI_SRCS})
- 
-# qt5_wrap_cpp(FTSPlotLib_MOC_SRCS ${FTSPlotLib_HDRS})
-# qt5_wrap_cpp(FTSPlot_MOC_SRCS mainwindow.h)
-# qt5_wrap_cpp(FTSPrepLib_MOC_SRCS ${FTSPrepLib_HDRS})
-# qt5_wrap_cpp(FTSPrep_MOC_SRCS ${FTSPrep_HDRS})
+
 
 # Set some Win32 Specific Settings
 IF(WIN32)
@@ -60,7 +46,6 @@ SET(GUI_TYPE MACOSX_BUNDLE)
 ENDIF (APPLE)
 
 add_executable(FTSPlot ${GUI_TYPE} ${FTSPlot_SRCS} ${FTSPlot_MOC_SRCS} ${FTSPlot_UI_HDRS})
-#qt5_use_modules(FTSPlot Widgets)
 add_executable(FTSPrep ${GUI_TYPE} ${FTSPrep_SRCS} ${FTSPrep_MOC_SRCS})
 add_library(FTSPlotLib ${FTSPlotLib_SRCS} ${FTSPlotLib_MOC_SRCS} ${FTSPlotLib_UI_HDRS} ${FTSPrepLib_SRCS} ${FTSPrepLib_MOC_SRCS} ${FTSPrep_UI_HDRS})
 qt5_use_modules(FTSPlotLib Widgets OpenGL)

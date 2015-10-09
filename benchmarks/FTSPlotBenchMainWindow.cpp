@@ -168,7 +168,7 @@ void FTSPlotBenchMainWindow::StarttsBenchmark()
     sView = new FTSPlotWidget ( NULL );
     if ( sView == NULL )
     {
-        qDebug() << "Cannot create SimpleViewWidget.";
+        qDebug() << "Cannot create FTSPlotWidget.";
         exit ( 1 );
     }
     sView->resize( 800, 600 );
@@ -428,7 +428,7 @@ void FTSPlotBenchMainWindow::paintDoneSlot()
                 }
                 else
                 {
-                    // delete simpleviewwidget
+                    // delete FTSPlotwidget
                     sView->deleteLater();
                     ui.centralwidget->setEnabled ( true );
                 }
@@ -515,7 +515,7 @@ void FTSPlotBenchMainWindow::StartEventBenchmark()
     sView = new FTSPlotWidget ( NULL );
     if ( sView == NULL )
     {
-        qDebug() << "Cannot create SimpleViewWidget.";
+        qDebug() << "Cannot create FTSPlotWidget.";
         exit ( 1 );
     }
     sView->resize( 800, 600 );
@@ -592,7 +592,7 @@ void FTSPlotBenchMainWindow::StartIntervalBenchmark()
     sView = new FTSPlotWidget ( NULL );
     if ( sView == NULL )
     {
-        qDebug() << "Cannot create SimpleViewWidget.";
+        qDebug() << "Cannot create FTSPlotWidget.";
         exit ( 1 );
     }
     sView->resize( 800, 600 );
@@ -613,11 +613,7 @@ void FTSPlotBenchMainWindow::StartIntervalBenchmark()
     displayListTest = false;
 
     // determine dataset length
-    benchLength = IntervalModule->getXmin();
-    qDebug() << "Min:" << benchLength;
-
     benchLength = IntervalModule->getXmax();
-    qDebug() << "Length(Max):" << benchLength;
     currentLength = 1;
     repetition = 0;
 

@@ -15,6 +15,8 @@ PLoS ONE 9(4): e94694. doi:10.1371/journal.pone.0094694
 
 When using this software in your projects please reference this paper in your publications.
 
+Note: This branch of FTSPlot has been updated to qt5 which introduces changes to the OpenGL handling. Changes to FTSPlot were necessary, most notably the switch from multi-threaded to single-threaded OpenGL access (the data of new display lists is still assembled in a separate thread, but uploading it into the OpenGL system is now done by the main thread that also handles the painting). These changes affect the performance. While painting is slightly faster, the display list generation times are now slower. It seems this has something to do with the display frame rate. The slot which uploads the new display lists probably has to wait until the next paintGL() call has finished. Therefore you typically get display list generation times around 16ms (1/(60Hz)) and 7ms (1/(144Hz)). 
+Therefore, to replicate the performance results of the publication, please use the qt4 version.
 
 ## System requirements
 - Qt >= 5.6

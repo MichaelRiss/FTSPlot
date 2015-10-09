@@ -1,38 +1,22 @@
 project(FTSPlot)
-cmake_minimum_required(VERSION 2.8.8)
-# find_package(Qt4 REQUIRED)
+cmake_minimum_required( VERSION 3.0.2 )
 find_package(Qt5 COMPONENTS Core Gui Widgets OpenGL)
 find_package(OpenGL REQUIRED)
-
-# set(QT_USE_QTMAIN true)
-# set(QT_USE_QTOPENGL true)
-# INCLUDE(${QT_USE_FILE})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
 
 foreach(item ${FTSPlotLib_SRCS})
-#   STRING(REGEX REPLACE "^(.+)$" "../\\1" value ${item})
   set(FTSPlotBenchLib_SRCS ${FTSPlotBenchLib_SRCS} ${CMAKE_SOURCE_DIR}/${item})
 endforeach(item)
-#set(FTSPlotBenchLib_SRCS ${FTSPlotBenchLib_SRCS} benchmarkHelper.cpp)
 set(FTSPlotBenchLib_SRCS ${FTSPlotBenchLib_SRCS} benchmarkHelper.cpp)
-
-# foreach(item ${FTSPlotBenchLib_SRCS})
-#   STRING(REPLACE "cpp" "h" value ${item})
-#   set(FTSPlotBenchLib_HDRS ${FTSPlotBenchLib_HDRS} ${value})
-# endforeach(item)
 
 set(FTSPlotBench_SRCS FTSPlotBenchMainWindow.cpp FTSPlotBench.cpp)
 set(FTSPlotBench_UI_SRCS FTSPlotBenchMainWindow.ui)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
-#qt5_wrap_ui(FTSPlotLib_UI_HDRS ${FTSPlotLib_UI_SRCS})
 qt5_wrap_ui(FTSPlotBench_UI_HDRS ${FTSPlotBench_UI_SRCS})
-# qt5_wrap_ui(FTSPlotBench_UI_HDRS ${FTSPlotBench_UI_SRCS})
-# qt4_automoc(${FTSPlotBench_SRCS})
-# qt4_wrap_cpp(FTSPlotBenchLib_MOC_SRCS ${FTSPlotBenchLib_HDRS} OPTIONS "-DBENCHMARK")
 
 # Set some Win32 Specific Settings
 IF(WIN32)
