@@ -120,7 +120,7 @@ void TimeSeriesPlot::genDisplayList( qint64 Xbegin, qint64 Xend, int reqPower, d
 void TimeSeriesPlot::toggleLists()
 {
     // No need for synchronization as we are called synchronously to
-    // the SimplePlotWidget paintGL() method
+    // the FTSPlotWidget paintGL() method
     useList = genList;
     genList = -1;
 }

@@ -132,7 +132,8 @@ void FTSPlotWidget::setupViewportProjection()
 
     GLdouble xend = XrightEdge / ( ( qint64 ) 1<<dispPower );
 
-    gluOrtho2D ( xbegin, xend, Ymin, Ymax );
+    //gluOrtho2D ( xbegin, xend, Ymin, Ymax );
+    glOrtho ( xbegin, xend, Ymin, Ymax, -1.0, 1.0 );
 }
 
 
@@ -232,7 +233,7 @@ void FTSPlotWidget::paintGL()
     GLenum err = glGetError();
     if ( err != GL_NO_ERROR )
     {
-        qDebug() << "SimpleViewWidget paintGL: " << gluErrorString ( err );
+        qDebug() << "FTSPlotWidget paintGL error number: " << err;
     }
 }
 
@@ -517,7 +518,7 @@ void FTSPlotWidget::keyReleaseEvent ( QKeyEvent * event )
 GL_Layer* FTSPlotWidget::addTimeSeries ( QString cfgFileName )
 {
 	if( !context()->isValid() ){
-		qDebug() << "SimpleViewWidget::addTimeSeries: context invalid, exiting. Make sure to \"show\" the SimpleViewWidget before adding modules.";
+		qDebug() << "FTSPlotWidget::addTimeSeries: context invalid, exiting. Make sure to \"show\" the FTSPlotWidget before adding modules.";
 		exit(1);
 	}
     TimeSeriesPlot* newTS = new TimeSeriesPlot ( this );
@@ -586,7 +587,7 @@ void FTSPlotWidget::addTimeSeries()
 GL_Layer* FTSPlotWidget::genEventEditor()
 {
 	if( !context()->isValid() ){
-		qDebug() << "SimpleViewWidget::genEventEditor: context invalid, exiting. Make sure to \"show\" the SimpleViewWidget before adding modules.";
+		qDebug() << "FTSPlotWidget::genEventEditor: context invalid, exiting. Make sure to \"show\" the FTSPlotWidget before adding modules.";
 		exit(1);
 	}
 
@@ -629,7 +630,7 @@ void FTSPlotWidget::addEventEditor()
 GL_Layer* FTSPlotWidget::genIntervalEditor()
 {
 	if( !context()->isValid() ){
-		qDebug() << "SimpleViewWidget::genIntervalEditor: context invalid, exiting. Make sure to \"show\" the SimpleViewWidget before adding modules.";
+		qDebug() << "FTSPlotWidget::genIntervalEditor: context invalid, exiting. Make sure to \"show\" the FTSPlotWidget before adding modules.";
 		exit(1);
 	}
 

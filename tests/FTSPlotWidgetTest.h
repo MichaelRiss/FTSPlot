@@ -16,23 +16,27 @@
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA */
 
 
-#include "SimpleViewTest.h"
+#ifndef FTSPLOTWIDGETTEST_H
+#define FTSPLOTWIDGETTEST_H
 
+#include <FTSPlotWidget.h>
 
-void SimpleViewTest::initTestCase()
+#include <QtTest/QTest>
+#include <QWidget>
+#include <QDebug>
+
+using namespace FTSPlot;
+
+class FTSPlotWidgetTest : public QObject
 {
-    Myparent = new QWidget();
-    QVERIFY( Myparent != NULL );
-    Myparent->show();
-    testWidget = new FTSPlotWidget( Myparent );
-    QVERIFY ( testWidget != NULL );
-}
+    Q_OBJECT
+    
+private:
+    FTSPlotWidget* testWidget;
+    QWidget* Myparent;
+private slots:
+    void initTestCase();
+    void cleanupTestCase();
+};
 
-
-void SimpleViewTest::cleanupTestCase()
-{
-    delete ( testWidget );
-    delete( Myparent );
-}
-
-#include "SimpleViewTest.moc"
+#endif // FTSPLOTWIDGETTEST_H

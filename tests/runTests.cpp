@@ -16,8 +16,9 @@
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA */
 
 
+#include <FTSPlotWidgetTest.h>
+
 #include <QtTest/QTest>
-#include "SimpleViewTest.h"
 #include "TimeSeriesPlotTest.h"
 #include "EventEditorTest.h"
 #include "IntervalEditorTest.h"
@@ -143,7 +144,7 @@ int main( int argc, char** argv )
     }
 
 
-    SimpleViewTest svt;
+    FTSPlotWidgetTest svt;
     QTest::qExec( &svt );
     
     TimeSeriesPlotTest tspt;

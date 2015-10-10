@@ -19,8 +19,9 @@
 #ifndef EVENTEDITORTEST_H
 #define EVENTEDITORTEST_H
 
+#include <FTSPlotWidgetTest.h>
+
 #include <QtTest/QTest>
-#include "SimpleViewTest.h"
 #include "EventEditor.h"
 
 using namespace FTSPlot;

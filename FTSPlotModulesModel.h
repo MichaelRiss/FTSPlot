@@ -16,8 +16,8 @@
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA */
 
 
-#ifndef SIMPLEVIEWMODULESMODEL_H
-#define SIMPLEVIEWMODULESMODEL_H
+#ifndef FTSPLOTMODULESMODEL_H
+#define FTSPLOTMODULESMODEL_H
 
 namespace FTSPlot
 {
@@ -60,5 +60,4 @@ public slots:
 
 }
 
-#endif // SIMPLEVIEWMODULESMODEL_H
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+#endif // FTSPLOTMODULESMODEL_H

@@ -186,7 +186,7 @@ QVariant FTSPlotModulesModel::headerData ( int section, Qt::Orientation orientat
             return QVariant ( QString ( "Color" ) );
             break;
         default:
-            qDebug() << "QVariant SimpleViewModulesModel::headerData() should never get sections >= 4!";
+            qDebug() << "QVariant FTSPlotModulesModel::headerData() should never get sections >= 4!";
             break;
         }
 
@@ -228,7 +228,7 @@ Qt::ItemFlags FTSPlotModulesModel::flags ( const QModelIndex& index ) const
         return ( Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable );
         break;
     default:
-        qDebug() << "Qt::ItemFlags SimpleViewModulesModel::flags() should never get columns >= 4!";
+        qDebug() << "Qt::ItemFlags FTSPlotModulesModel::flags() should never get columns >= 4!";
         break;
     }
 

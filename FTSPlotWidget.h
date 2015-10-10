@@ -16,8 +16,8 @@
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA */
 
 
-#ifndef __SIMPLEVIEWWIDGET_H__
-#define __SIMPLEVIEWWIDGET_H__
+#ifndef __FTSPLOTWIDGET_H__
+#define __FTSPLOTWIDGET_H__
 
 namespace FTSPlot
 {
@@ -29,13 +29,6 @@ class FTSPlotWidget;
 #include <QSet>
 #include <QOpenGLFunctions_1_0>
 #include <QOpenGLWidget>
-#if defined(Q_WS_MAC)
-# include <OpenGL/glu.h>
-#else
-# ifndef QT_LINUXBASE
-#  include <GL/glu.h>
-# endif
-#endif
 #include <QThread>
 #include <QFileDialog>
 #include <QMutex>

@@ -38,7 +38,7 @@ public:
     FTSPlotBenchMainWindow(QWidget* parent = 0, Qt::WindowFlags flags = 0);
 private:
     Ui::MainWindow ui;
-    FTSPlotWidget* sView;
+    FTSPlotWidget* FTSCanvas;
     TimeSeriesPlot* tsModule;
     EventEditor* EventModule;
     IntervalEditor* IntervalModule;

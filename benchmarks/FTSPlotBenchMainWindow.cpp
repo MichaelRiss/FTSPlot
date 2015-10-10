@@ -164,25 +164,25 @@ void FTSPlotBenchMainWindow::StarttsBenchmark()
     // disable GUI
     ui.centralwidget->setDisabled ( true );
 
-    // create SimpleView
-    sView = new FTSPlotWidget ( NULL );
-    if ( sView == NULL )
+    // create FTSPlotWidget
+    FTSCanvas = new FTSPlotWidget ( NULL );
+    if ( FTSCanvas == NULL )
     {
         qDebug() << "Cannot create FTSPlotWidget.";
         exit ( 1 );
     }
-    sView->resize( 800, 600 );
-    sView->show();
+    FTSCanvas->resize( 800, 600 );
+    FTSCanvas->show();
     // add TS
-    tsModule = ( TimeSeriesPlot* ) sView->addTimeSeries ( ui.tsDataSetLine->text() );
+    tsModule = ( TimeSeriesPlot* ) FTSCanvas->addTimeSeries ( ui.tsDataSetLine->text() );
     if ( tsModule == NULL )
     {
         qDebug() << "Cannot create TimeSeries module.";
         exit ( 1 );
     }
-    connect ( sView, SIGNAL ( paintTime ( qint64 ) ), this, SLOT ( handlePaintTime ( qint64 ) ) );
-    connect ( sView, SIGNAL ( displayListTime ( qint64 ) ), this, SLOT ( handlePrepTime ( qint64 ) ) );
-    connect ( sView, SIGNAL ( paintingDone() ), this, SLOT ( paintDoneSlot() ) );
+    connect ( FTSCanvas, SIGNAL ( paintTime ( qint64 ) ), this, SLOT ( handlePaintTime ( qint64 ) ) );
+    connect ( FTSCanvas, SIGNAL ( displayListTime ( qint64 ) ), this, SLOT ( handlePrepTime ( qint64 ) ) );
+    connect ( FTSCanvas, SIGNAL ( paintingDone() ), this, SLOT ( paintDoneSlot() ) );
 
     // set state variables for benchmark
     displayListTest = false;
@@ -232,7 +232,7 @@ void FTSPlotBenchMainWindow::StarttsBenchmark()
 #endif // COUNT_TILES
 
     // kick off benchmarking
-    sView->displayRange ( 0, currentLength );
+    FTSCanvas->displayRange ( 0, currentLength );
 }
 
 void FTSPlotBenchMainWindow::handlePaintTime ( qint64 value )
@@ -332,7 +332,7 @@ void FTSPlotBenchMainWindow::paintDoneSlot()
 #endif // LINUX_DISABLE_FILESYSTEMCACHE
 
 
-                sView->displayRange ( 0, currentLength );
+                FTSCanvas->displayRange ( 0, currentLength );
             }
             else
             {
@@ -362,12 +362,12 @@ void FTSPlotBenchMainWindow::paintDoneSlot()
                     return;
                 }
                 displayListResStream.setDevice ( &displayListResultsFile );
-                sView->displayRange ( 0, currentLength );
+                FTSCanvas->displayRange ( 0, currentLength );
             }
         }
         else
         {
-            sView->update();
+            FTSCanvas->update();
         }
     }
     else
@@ -423,13 +423,13 @@ void FTSPlotBenchMainWindow::paintDoneSlot()
                     }
 #endif // LINUX_DISABLE_FILESYSTEMCACHE
 
-                    sView->displayRange ( 0, currentLength );
+                    FTSCanvas->displayRange ( 0, currentLength );
                     displayListReset = false;
                 }
                 else
                 {
                     // delete FTSPlotwidget
-                    sView->deleteLater();
+                    FTSCanvas->deleteLater();
                     ui.centralwidget->setEnabled ( true );
                 }
             }
@@ -489,7 +489,7 @@ void FTSPlotBenchMainWindow::paintDoneSlot()
                 }
 #endif // LINUX_DISABLE_FILESYSTEMCACHE
 
-                sView->displayRange ( 0, currentLength );
+                FTSCanvas->displayRange ( 0, currentLength );
                 displayListReset = false;
             }
         }
@@ -499,7 +499,7 @@ void FTSPlotBenchMainWindow::paintDoneSlot()
             displayListResStream << displayTimeCache << endl;
             paintTimeCache = -10;
             displayTimeCache = -10;
-            sView->displayRange ( -100000, -99999 );
+            FTSCanvas->displayRange ( -100000, -99999 );
             displayListReset = true;
         }
     }
@@ -511,26 +511,26 @@ void FTSPlotBenchMainWindow::StartEventBenchmark()
     // disable GUI
     ui.centralwidget->setDisabled ( true );
 
-    // create SimpleView
-    sView = new FTSPlotWidget ( NULL );
-    if ( sView == NULL )
+    // create FTSPlotWidget
+    FTSCanvas = new FTSPlotWidget ( NULL );
+    if ( FTSCanvas == NULL )
     {
         qDebug() << "Cannot create FTSPlotWidget.";
         exit ( 1 );
     }
-    sView->resize( 800, 600 );
-    sView->show();
+    FTSCanvas->resize( 800, 600 );
+    FTSCanvas->show();
     // add EventEditor
-    EventModule = ( EventEditor* ) sView->addEventEditorModule ( ui.EventDatasetLine->text() );
+    EventModule = ( EventEditor* ) FTSCanvas->addEventEditorModule ( ui.EventDatasetLine->text() );
     EventModule->hideGUI();
     if ( EventModule == NULL )
     {
         qDebug() << "Cannot create EventEditor module.";
         exit ( 1 );
     }
-    connect ( sView, SIGNAL ( paintTime ( qint64 ) ), this, SLOT ( handlePaintTime ( qint64 ) ) );
-    connect ( sView, SIGNAL ( displayListTime ( qint64 ) ), this, SLOT ( handlePrepTime ( qint64 ) ) );
-    connect ( sView, SIGNAL ( paintingDone() ), this, SLOT ( paintDoneSlot() ) );
+    connect ( FTSCanvas, SIGNAL ( paintTime ( qint64 ) ), this, SLOT ( handlePaintTime ( qint64 ) ) );
+    connect ( FTSCanvas, SIGNAL ( displayListTime ( qint64 ) ), this, SLOT ( handlePrepTime ( qint64 ) ) );
+    connect ( FTSCanvas, SIGNAL ( paintingDone() ), this, SLOT ( paintDoneSlot() ) );
 
     // set state variables for benchmark
     displayListTest = false;
@@ -580,7 +580,7 @@ void FTSPlotBenchMainWindow::StartEventBenchmark()
 #endif // COUNT_TILES
 
     // kick off benchmarking
-    sView->displayRange ( 0, currentLength );
+    FTSCanvas->displayRange ( 0, currentLength );
 }
 
 void FTSPlotBenchMainWindow::StartIntervalBenchmark()
@@ -588,26 +588,26 @@ void FTSPlotBenchMainWindow::StartIntervalBenchmark()
     // disable GUI
     ui.centralwidget->setDisabled ( true );
 
-    // create SimpleView
-    sView = new FTSPlotWidget ( NULL );
-    if ( sView == NULL )
+    // create FTSPlotWidget
+    FTSCanvas = new FTSPlotWidget ( NULL );
+    if ( FTSCanvas == NULL )
     {
         qDebug() << "Cannot create FTSPlotWidget.";
         exit ( 1 );
     }
-    sView->resize( 800, 600 );
-    sView->show();
+    FTSCanvas->resize( 800, 600 );
+    FTSCanvas->show();
     // add EventEditor
-    IntervalModule = ( IntervalEditor* ) sView->addIntervalEditorModule ( ui.IntervalDatasetLine->text() );
+    IntervalModule = ( IntervalEditor* ) FTSCanvas->addIntervalEditorModule ( ui.IntervalDatasetLine->text() );
     IntervalModule->hideGUI();
     if ( IntervalModule == NULL )
     {
         qDebug() << "Cannot create IntervalEditor module.";
         exit ( 1 );
     }
-    connect ( sView, SIGNAL ( paintTime ( qint64 ) ), this, SLOT ( handlePaintTime ( qint64 ) ) );
-    connect ( sView, SIGNAL ( displayListTime ( qint64 ) ), this, SLOT ( handlePrepTime ( qint64 ) ) );
-    connect ( sView, SIGNAL ( paintingDone() ), this, SLOT ( paintDoneSlot() ) );
+    connect ( FTSCanvas, SIGNAL ( paintTime ( qint64 ) ), this, SLOT ( handlePaintTime ( qint64 ) ) );
+    connect ( FTSCanvas, SIGNAL ( displayListTime ( qint64 ) ), this, SLOT ( handlePrepTime ( qint64 ) ) );
+    connect ( FTSCanvas, SIGNAL ( paintingDone() ), this, SLOT ( paintDoneSlot() ) );
 
     // set state variables for benchmark
     displayListTest = false;
@@ -658,7 +658,7 @@ void FTSPlotBenchMainWindow::StartIntervalBenchmark()
 #endif // COUNT_TILES
 
     // kick off benchmarking
-    sView->displayRange ( 0, currentLength );
+    FTSCanvas->displayRange ( 0, currentLength );
 }
 
 
