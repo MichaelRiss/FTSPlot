@@ -19,6 +19,7 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then (/opt/X11/bin/Xvfb :99 -ac -screen 0 1280x1024x24 &); fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install qt5; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew list qt5; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" -a "$CXX" == "g++" ]; then brew unlink gcc; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" -a "$CXX" == "g++" ]; then brew install gcc; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" -a "$CXX" == "g++" ]; then ln -s /usr/local/bin/gcc-5 /usr/local/bin/gcc; fi

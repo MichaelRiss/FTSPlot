@@ -21,11 +21,11 @@ configuration:
 #    MAKECALL: mingw32-make
 
 install:
-  - choco install curl
-  - IF "%CONFIGURATION%"=="2012" ( SET CMAKECALL='cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release .' )
-  - IF "%CONFIGURATION%"=="2012" ( SET MAKECALL='nmake' )
-  - IF "%CONFIGURATION%"=="MinGW" ( SET CMAKECALL='cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release .' )
-  - IF "%CONFIGURATION%"=="MinGW" ( SET MAKECALL='mingw32-make' )
+#  - choco install curl
+#  - IF "%CONFIGURATION%"=="2012" ( SET CMAKECALL='cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release .' )
+#  - IF "%CONFIGURATION%"=="2012" ( SET MAKECALL='nmake' )
+#  - IF "%CONFIGURATION%"=="MinGW" ( SET CMAKECALL='cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release .' )
+#  - IF "%CONFIGURATION%"=="MinGW" ( SET MAKECALL='mingw32-make' )
   
 #  - mkdir extern
 #  - cd extern
@@ -48,8 +48,14 @@ install:
   
 
 build_script:
-  - %CMAKECALL%
-  - %MAKECALL%
+#  - "%CMAKECALL%"
+  # run cmake
+  - IF "%CONFIGURATION%"=="2012" ( cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release . )
+  - IF "%CONFIGURATION%"=="MinGW" ( cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release . )
+  # run make
+  - IF "%CONFIGURATION%"=="2012" ( nmake )
+  - IF "%CONFIGURATION%"=="MinGW" ( mingw32-make )
+#  - "%MAKECALL%"
 
 test_script:
   - cd tests
