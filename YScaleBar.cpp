@@ -58,8 +58,7 @@ void YScaleBar::resizeGL(int width, int height)
     glViewport(0, 0, (GLint)width, (GLint)height);
     glMatrixMode ( GL_PROJECTION );
     glLoadIdentity ();
-    // TODO: replace with non GLU function
-    gluOrtho2D( 0.0, (double) width, 0, (double) height );
+    glOrtho( 0.0, (double) width, 0, (double) height, -1.0, 1.0 );
 }
 
 void YScaleBar::paintGL()

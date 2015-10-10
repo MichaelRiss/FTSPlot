@@ -18,7 +18,7 @@
 #ifndef DISPLAYLISTDATA_H_
 #define DISPLAYLISTDATA_H_
 
-#include <GL/gl.h>
+#include <QOpenGLFunctions_1_0>
 #include <QVector>
 
 namespace FTSPlot

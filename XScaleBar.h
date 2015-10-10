@@ -23,13 +23,6 @@
 #include <sstream>
 #include <QOpenGLFunctions_1_0>
 #include <QOpenGLWidget>
-#if defined(Q_WS_MAC)
-# include <OpenGL/glu.h>
-#else
-# ifndef QT_LINUXBASE
-#  include <GL/glu.h>
-# endif
-#endif
 #include <QDebug>
 #include <QFont>
 #include <QFontMetrics>
