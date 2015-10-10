@@ -21,9 +21,8 @@ configuration:
 #    MAKECALL: mingw32-make
 
 install:
-#  - dir "C:\Program Files (x86)"
   - IF "%CONFIGURATION%"=="2012" ( "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64 )
-  - IF "%CONFIGURATION%"=="2012" ( set PATH=C:\Qt\5.5\msvc2013_64\bin;%PATH%)
+  - IF "%CONFIGURATION%"=="2012" ( set PATH=C:\Qt\5.5\msvc2013_64\bin;%PATH% )
   - IF "%CONFIGURATION%"=="MinGW" ( set PATH=C:\Qt\Tools\mingw492_32\bin;%PATH% )
   - IF "%CONFIGURATION%"=="MinGW" ( set PATH=C:\Qt\5.5\mingw492_32\bin;%PATH% )
 #  - choco install curl
