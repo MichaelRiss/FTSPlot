@@ -48,8 +48,8 @@ install:
   
 
 build_script:
-  - '%CMAKECALL%'
-  - '%MAKECALL%'
+  - %CMAKECALL%
+  - %MAKECALL%
 
 test_script:
   - cd tests
