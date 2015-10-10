@@ -1,41 +1,50 @@
 # lots of thanks to https://github.com/hicknhack-software/QSqlMigrator/blob/master/appveyor.yml !
 
-environment:
-  matrix:
-  - BUILD: MSVS2010
-    SETCOMPILER: '"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x86'
-    QTDOWNLOAD1: http://download.qt.io/archive/qt/4.8/4.8.6/qt-opensource-windows-x86-vs2010-4.8.6.exe
-    QTARCHIVE1: qt-opensource-windows-x86-vs2010-4.8.6.exe
-    CMAKECALL: 'cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release .'
-    MAKECALL: nmake
+configuration:
+  - 2012
+  - MinGW
+
+#environment:
+#  matrix:
+#  - BUILD: MSVS2010
+#    SETCOMPILER: '"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x86'
+#    QTDOWNLOAD1: http://download.qt.io/archive/qt/4.8/4.8.6/qt-opensource-windows-x86-vs2010-4.8.6.exe
+#    QTARCHIVE1: qt-opensource-windows-x86-vs2010-4.8.6.exe
+#    CMAKECALL: 'cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release .'
+#    MAKECALL: nmake
     
-  - BUILD: MINGW32
-    SETCOMPILER: 'set PATH=C:\Qt\Tools\mingw482_32\bin;%PATH%'
-    QTDOWNLOAD1: http://download.qt.io/archive/qt/4.8/4.8.6/qt-opensource-windows-x86-mingw482-4.8.6-1.exe
-    QTARCHIVE1: qt-opensource-windows-x86-mingw482-4.8.6-1.exe
-    CMAKECALL: 'cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release .'
-    MAKECALL: mingw32-make
+#  - BUILD: MINGW32
+#    SETCOMPILER: 'set PATH=C:\Qt\Tools\mingw482_32\bin;%PATH%'
+#    QTDOWNLOAD1: http://download.qt.io/archive/qt/4.8/4.8.6/qt-opensource-windows-x86-mingw482-4.8.6-1.exe
+#    QTARCHIVE1: qt-opensource-windows-x86-mingw482-4.8.6-1.exe
+#    CMAKECALL: 'cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release .'
+#    MAKECALL: mingw32-make
 
 install:
   - choco install curl
-  - mkdir extern
-  - cd extern
+  - IF "%CONFIGURATION%"=="2012" ( SET CMAKECALL='cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release .' )
+  - IF "%CONFIGURATION%"=="2012" ( SET MAKECALL='nmake' )
+  - IF "%CONFIGURATION%"=="MinGW" ( SET CMAKECALL='cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release .' )
+  - IF "%CONFIGURATION%"=="MinGW" ( SET MAKECALL='mingw32-make' )
   
-  - mkdir Qt
-  - cd Qt
-  - curl -kLO %QTDOWNLOAD1%
-  - 7z x "-ir!?OUTDIR\*" "-xr!*doc\*" "-xr!*examples\*" "-xr!*demos\*" %QTARCHIVE1% >nul
-  - move $OUTDIR\bin 4.8.6
-  - set QTDIR=%CD%\4.8.6
-  - echo [Paths] >%QTDIR%\bin\qt.conf
-  - echo Prefix=.. >>%QTDIR%\bin\qt.conf
-  - set QT_PLUGIN_PATH=%QTDIR%\plugins
-  - cd ..
+#  - mkdir extern
+#  - cd extern
   
-  - cd ..
-  - '%SETCOMPILER%'
-  - set PATH=%QTDIR%\bin;%PATH%
-  - move "C:\Program Files (x86)\Git\bin\sh.exe" "C:\Program Files (x86)\Git\bin\shxx.exe"
+#  - mkdir Qt
+#  - cd Qt
+#  - curl -kLO %QTDOWNLOAD1%
+#  - 7z x "-ir!?OUTDIR\*" "-xr!*doc\*" "-xr!*examples\*" "-xr!*demos\*" %QTARCHIVE1% >nul
+#  - move $OUTDIR\bin 4.8.6
+#  - set QTDIR=%CD%\4.8.6
+#  - echo [Paths] >%QTDIR%\bin\qt.conf
+#  - echo Prefix=.. >>%QTDIR%\bin\qt.conf
+#  - set QT_PLUGIN_PATH=%QTDIR%\plugins
+#  - cd ..
+  
+#  - cd ..
+#  - '%SETCOMPILER%'
+#  - set PATH=%QTDIR%\bin;%PATH%
+#  - move "C:\Program Files (x86)\Git\bin\sh.exe" "C:\Program Files (x86)\Git\bin\shxx.exe"
   
 
 build_script:
