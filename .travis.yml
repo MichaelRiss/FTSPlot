@@ -22,7 +22,8 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq qt5-default qttools5-dev-tools xvfb; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then qmake -version; fi
   - "export DISPLAY=:99.0"
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then (sh -e /etc/init.d/xvfb start); fi
+  #- if [ "$TRAVIS_OS_NAME" == "linux" ]; then (sh -e /etc/init.d/xvfb start); fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then start xvfb; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then (/opt/X11/bin/Xvfb :99 -ac -screen 0 1280x1024x24 &); fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install qt5; fi

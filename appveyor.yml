@@ -79,6 +79,7 @@ install:
 
 before_build:
   - cd
+  - echo %APPVEYOR_BUILD_FOLDER%
   - '%cmakecall%'
 
 build_script:
