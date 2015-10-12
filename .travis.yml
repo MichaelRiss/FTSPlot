@@ -22,8 +22,8 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo add-apt-repository -y ppa:george-edison55/cmake-3.x; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo add-apt-repository -y ppa:beineri/opt-qt55-trusty; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update -qq; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install --only-upgrade cmake qt55base; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq qt5-default qttools5-dev-tools xvfb; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install --only-upgrade cmake; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq qt55base xvfb; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then . /opt/qt55/bin/qt55-env.sh; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then qmake -version; fi
   - "export DISPLAY=:99.0"
