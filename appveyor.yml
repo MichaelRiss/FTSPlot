@@ -8,14 +8,15 @@ environment:
   VSVER: 12.0 # Visual Studio 2013
   matrix:
     - QTDIR: C:\Qt\5.3\mingw482_32
-    - QTDIR: C:\Qt\5.3\msvc2013_64_opengl
-    - QTDIR: C:\Qt\5.3\msvc2013_opengl
-    - QTDIR: C:\Qt\5.4\mingw491_32
-    - QTDIR: C:\Qt\5.4\msvc2013_64_opengl
-    - QTDIR: C:\Qt\5.4\msvc2013_opengl
-    - QTDIR: C:\Qt\5.5\mingw492_32
-    - QTDIR: C:\Qt\5.5\msvc2013
-    - QTDIR: C:\Qt\5.5\msvc2013_64
+    #- QTDIR: C:\Qt\5.3\msvc2013_64_opengl
+    #- QTDIR: C:\Qt\5.3\msvc2013_opengl
+    #- QTDIR: C:\Qt\5.4\mingw491_32
+    #- QTDIR: C:\Qt\5.4\msvc2013_64_opengl
+    #- QTDIR: C:\Qt\5.4\msvc2013_opengl
+    #- QTDIR: C:\Qt\5.5\mingw492_32
+    #- QTDIR: C:\Qt\5.5\msvc2013
+    #- QTDIR: C:\Qt\5.5\msvc2013_64
+
 #  - BUILD: MSVS2010
 #    SETCOMPILER: '"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x86'
 #    QTDOWNLOAD1: http://download.qt.io/archive/qt/4.8/4.8.6/qt-opensource-windows-x86-vs2010-4.8.6.exe
@@ -77,6 +78,7 @@ install:
 #  - move "C:\Program Files (x86)\Git\bin\sh.exe" "C:\Program Files (x86)\Git\bin\shxx.exe"
 
 before_build:
+  - cd
   - '%cmakecall%'
 
 build_script:
