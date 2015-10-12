@@ -43,7 +43,8 @@ install:
   - echo %ARCH%
   - echo %QTDIR%
   - echo %QTDIR:msvc=%
-  - ren "C:/Program Files (x86)/Git/bin/sh.exe" "C:/Program Files (x86)/Git/bin/shxx.exe"
+  - cd "C:/Program Files (x86)/Git/bin/sh.exe"
+  - ren sh.exe shxx.exe
   - if %QTDIR:msvc=%==%QTDIR% g++ --version
   - if %QTDIR:msvc=%==%QTDIR% set make=mingw32-make.exe
   - if %QTDIR:msvc=%==%QTDIR% %make% --version
