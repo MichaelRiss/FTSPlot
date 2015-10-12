@@ -52,7 +52,7 @@ install:
   - if not %QTDIR:msvc=%==%QTDIR% call "%ProgramFiles(x86)%\Microsoft Visual Studio %VSVER%\VC\vcvarsall.bat" %ARCH%
   - if not %QTDIR:msvc=%==%QTDIR% set make=nmake.exe
   - if not %QTDIR:msvc=%==%QTDIR% %make% /? > nul
-  - if not %QTDIR:msvc=%==%QTDIR% set cmakecall=cmake -G "NMAKE Makefiles" -DCMAKE_BUILD_TYPE=%CONFIGURATION% %APPVEYOR_BUILD_FOLDER%
+  - if not %QTDIR:msvc=%==%QTDIR% set cmakecall=cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=%CONFIGURATION% %APPVEYOR_BUILD_FOLDER%
 #  - IF "%CONFIGURATION%"=="2012" ( "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64 )
   #- IF "%CONFIGURATION%"=="2012" ( "set PATH=C:\Qt\5.5\msvc2013_64\bin;%PATH%" )
   #- IF "%CONFIGURATION%"=="MinGW" ( set PATH=C:\Qt\Tools\mingw492_32\bin;%PATH% )
