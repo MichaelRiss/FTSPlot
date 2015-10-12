@@ -1,11 +1,21 @@
-# lots of thanks to https://github.com/hicknhack-software/QSqlMigrator/blob/master/appveyor.yml !
+# lots of thanks to https://github.com/pcolby/libqtaws/blob/master/.appveyor.yml !
 
-configuration:
-  - 2012
-  - MinGW
+#configuration:
+  #- 2012
+  #- MinGW
 
-#environment:
-#  matrix:
+environment:
+  VSVER: 12.0 # Visual Studio 2013
+  matrix:
+    - QTDIR: C:\Qt\5.3\mingw482_32
+    - QTDIR: C:\Qt\5.3\msvc2013_64_opengl
+    - QTDIR: C:\Qt\5.3\msvc2013_opengl
+    - QTDIR: C:\Qt\5.4\mingw491_32
+    - QTDIR: C:\Qt\5.4\msvc2013_64_opengl
+    - QTDIR: C:\Qt\5.4\msvc2013_opengl
+    - QTDIR: C:\Qt\5.5\mingw492_32
+    - QTDIR: C:\Qt\5.5\msvc2013
+    - QTDIR: C:\Qt\5.5\msvc2013_64
 #  - BUILD: MSVS2010
 #    SETCOMPILER: '"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x86'
 #    QTDOWNLOAD1: http://download.qt.io/archive/qt/4.8/4.8.6/qt-opensource-windows-x86-vs2010-4.8.6.exe
@@ -20,11 +30,27 @@ configuration:
 #    CMAKECALL: 'cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release .'
 #    MAKECALL: mingw32-make
 
+configuration:
+  - Debug
+  - Release
+
 install:
+  # Setup the build toolchains.
+  - '%QTDIR%\bin\qtenv2.bat'
+  - qmake -v
+  - if %QTDIR:_64=%==%QTDIR% ( set ARCH=x86 ) else set ARCH=x64
+  - if %QTDIR:msvc=%==%QTDIR% g++ --version
+  - if %QTDIR:msvc=%==%QTDIR% set make=mingw32-make.exe
+  - if %QTDIR:msvc=%==%QTDIR% %make% --version
+  - if %QTDIR:msvc=%==%QTDIR% set cmakecall=cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=%CONFIGURATION% .
+  - if not %QTDIR:msvc=%==%QTDIR% call "%ProgramFiles(x86)%\Microsoft Visual Studio %VSVER%\VC\vcvarsall.bat" %ARCH%
+  - if not %QTDIR:msvc=%==%QTDIR% set make=nmake.exe
+  - if not %QTDIR:msvc=%==%QTDIR% %make% /? > nul
+  - if not %QTDIR:msvc=%==%QTDIR% set cmakecall=cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=%CONFIGURATION% .
 #  - IF "%CONFIGURATION%"=="2012" ( "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64 )
-  - IF "%CONFIGURATION%"=="2012" ( "set PATH=C:\Qt\5.5\msvc2013_64\bin;%PATH%" )
-  - IF "%CONFIGURATION%"=="MinGW" ( set PATH=C:\Qt\Tools\mingw492_32\bin;%PATH% )
-  - IF "%CONFIGURATION%"=="MinGW" ( set PATH=C:\Qt\5.5\mingw492_32\bin;%PATH% )
+  #- IF "%CONFIGURATION%"=="2012" ( "set PATH=C:\Qt\5.5\msvc2013_64\bin;%PATH%" )
+  #- IF "%CONFIGURATION%"=="MinGW" ( set PATH=C:\Qt\Tools\mingw492_32\bin;%PATH% )
+  #- IF "%CONFIGURATION%"=="MinGW" ( set PATH=C:\Qt\5.5\mingw492_32\bin;%PATH% )
 #  - choco install curl
 #  - IF "%CONFIGURATION%"=="2012" ( SET CMAKECALL='cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release .' )
 #  - IF "%CONFIGURATION%"=="2012" ( SET MAKECALL='nmake' )
@@ -49,16 +75,19 @@ install:
 #  - '%SETCOMPILER%'
 #  - set PATH=%QTDIR%\bin;%PATH%
 #  - move "C:\Program Files (x86)\Git\bin\sh.exe" "C:\Program Files (x86)\Git\bin\shxx.exe"
-  
+
+before_build:
+  - '%cmakecall%'
 
 build_script:
+  - '%make%'
 #  - "%CMAKECALL%"
-  # run cmake
-  - IF "%CONFIGURATION%"=="2012" ( cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release . )
-  - IF "%CONFIGURATION%"=="MinGW" ( cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release . )
-  # run make
-  - IF "%CONFIGURATION%"=="2012" ( nmake )
-  - IF "%CONFIGURATION%"=="MinGW" ( mingw32-make )
+  ## run cmake
+  #- IF "%CONFIGURATION%"=="2012" ( cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release . )
+  #- IF "%CONFIGURATION%"=="MinGW" ( cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release . )
+  ## run make
+  #- IF "%CONFIGURATION%"=="2012" ( nmake )
+  #- IF "%CONFIGURATION%"=="MinGW" ( mingw32-make )
 #  - "%MAKECALL%"
 
 test_script:

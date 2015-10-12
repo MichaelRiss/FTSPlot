@@ -1,3 +1,7 @@
+sudo: required
+services:
+  - docker
+
 language: cpp
 os:
   - linux
@@ -5,15 +9,18 @@ os:
 compiler:
   - gcc
   - clang
-addons:
-  apt:
-    sources:
-      - george-edison55-precise-backports
-      - ubuntu-sdk-team
-    packages:
-      - cmake
-      - qtbase-opensource-src
+#addons:
+  #apt:
+    #sources:
+      #- george-edison55-precise-backports
+      #- ubuntu-sdk-team
+    #packages:
+      #- cmake
+      #- qtbase-opensource-src
 before_install:
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update -qq; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq qt5-default qttools5-dev-tools; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then qmake -version; fi
   - "export DISPLAY=:99.0"
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then (sh -e /etc/init.d/xvfb start); fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then (/opt/X11/bin/Xvfb :99 -ac -screen 0 1280x1024x24 &); fi
