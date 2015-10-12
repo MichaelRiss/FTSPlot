@@ -40,6 +40,9 @@ install:
   - '%QTDIR%\bin\qtenv2.bat'
   - qmake -v
   - if %QTDIR:_64=%==%QTDIR% ( set ARCH=x86 ) else set ARCH=x64
+  - echo %ARCH%
+  - echo %QTDIR%
+  - echo %QTDIR:msvc=%
   - if %QTDIR:msvc=%==%QTDIR% g++ --version
   - if %QTDIR:msvc=%==%QTDIR% set make=mingw32-make.exe
   - if %QTDIR:msvc=%==%QTDIR% %make% --version
