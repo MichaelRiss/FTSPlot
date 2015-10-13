@@ -17,17 +17,9 @@
 
 
 #include "EventEditorTest.h"
-#ifdef Q_WS_X11
-#include <X11/Xlib.h>
-#endif
-
 
 void EventEditorTest::initTestCase()
 {
-#ifdef Q_WS_X11
-    XInitThreads();
-#endif
-    
     mywidget = new QWidget();
     mywidget->show();
     tsplot = new FTSPlotWidget ( mywidget );

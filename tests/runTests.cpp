@@ -33,9 +33,6 @@
 #include "IntervalsTest.h"
 
 #include "FTSPrep.h"
-#ifdef Q_WS_X11
-#include <X11/Xlib.h>
-#endif
 
 bool RemoveDirectory ( QDir aDir )
 {
@@ -68,11 +65,6 @@ bool RemoveDirectory ( QDir aDir )
 
 int main( int argc, char** argv )
 {
-  
-#ifdef Q_WS_X11
-    XInitThreads();
-#endif
-  
     QApplication a(argc, argv);
 
     // delete test data directory
