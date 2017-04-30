@@ -7,7 +7,13 @@ set(QT_USE_QTMAIN true)
 set(QT_USE_QTOPENGL true)
 INCLUDE(${QT_USE_FILE})
 
-include_directories(${QT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR})
+IF(UNIX)
+find_package(X11 REQUIRED)
+set(ADDITIONAL_DIR ${X11_INCLUDE_DIR})
+set(ADDITIONAL_LIB ${X11_LIBRARIES})
+ENDIF(UNIX)
+
+include_directories(${QT_INCLUDES} ${ADDITIONAL_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR})
 
 foreach(item ${FTSPlotLib_SRCS})
   STRING(REGEX REPLACE "^(.+)$" "../\\1" value ${item})
@@ -52,4 +58,4 @@ endif ( COUNT_TILES )
 set_property(TARGET FTSPlotBench PROPERTY COMPILE_DEFINITIONS ${DEFINES})
 set_property(TARGET FTSPlotBenchLib PROPERTY COMPILE_DEFINITIONS ${DEFINES})
 
-target_link_libraries(FTSPlotBench FTSPlotBenchLib ${QT_LIBRARIES} ${OPENGL_LIBRARIES} -lrt)
+target_link_libraries(FTSPlotBench FTSPlotBenchLib ${QT_LIBRARIES} ${ADDITIONAL_LIB} ${OPENGL_LIBRARIES} -lrt)

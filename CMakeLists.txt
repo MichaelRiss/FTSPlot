@@ -7,7 +7,13 @@ set(QT_USE_QTMAIN true)
 set(QT_USE_QTOPENGL true)
 INCLUDE(${QT_USE_FILE})
 
-include_directories(${QT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR})
+IF(UNIX)
+find_package(X11 REQUIRED)
+set(ADDITIONAL_DIR ${X11_INCLUDE_DIR})
+set(ADDITIONAL_LIB ${X11_LIBRARIES})
+ENDIF(UNIX)
+
+include_directories(${QT_INCLUDES} ${ADDITIONAL_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR})
 
 option( LINUX_DISABLE_FILESYSTEMCACHE "When benchmarking on Linux empty the filesystem cache before each test run. You need to be root or have write access to /proc/sys/vm/drop_caches to use this feature." )
 option( COUNT_TILES "Output the number of vertexes, lines and quads generated." )
@@ -70,7 +76,7 @@ endif ( COUNT_TILES )
 set_property(TARGET FTSPlotLib PROPERTY COMPILE_DEFINITIONS ${DEFINES})
 set_property(TARGET FTSPlot PROPERTY COMPILE_DEFINITIONS ${DEFINES})
 
-target_link_libraries(FTSPlot FTSPlotLib ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
+target_link_libraries(FTSPlot FTSPlotLib ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${ADDITIONAL_LIB})
 target_link_libraries(FTSPrep FTSPlotLib ${QT_LIBRARIES})
 target_link_libraries(FTSPlotLib ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
 
