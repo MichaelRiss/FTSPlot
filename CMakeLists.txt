@@ -56,6 +56,9 @@ ENDIF(WIN32)
 IF (APPLE)
 SET(GUI_TYPE MACOSX_BUNDLE)
 ENDIF (APPLE)
+IF (UNIX)
+find_package(X11 REQUIRED)
+ENDIF (UNIX)
 
 add_executable(FTSPlot ${GUI_TYPE} ${FTSPlot_SRCS} ${FTSPlot_MOC_SRCS} ${FTSPlot_UI_HDRS})
 add_executable(FTSPrep ${GUI_TYPE} ${FTSPrep_SRCS} ${FTSPrep_MOC_SRCS})
@@ -70,7 +73,7 @@ endif ( COUNT_TILES )
 set_property(TARGET FTSPlotLib PROPERTY COMPILE_DEFINITIONS ${DEFINES})
 set_property(TARGET FTSPlot PROPERTY COMPILE_DEFINITIONS ${DEFINES})
 
-target_link_libraries(FTSPlot FTSPlotLib ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
+target_link_libraries(FTSPlot FTSPlotLib ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${X11_LIBRARIES})
 target_link_libraries(FTSPrep FTSPlotLib ${QT_LIBRARIES})
 target_link_libraries(FTSPlotLib ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
 
