@@ -49,6 +49,8 @@ public:
     void setProgressGranularity( quint64 gran = 2048 );
     ResumeData getResumeData();
 
+    void run();
+
 public slots:
     void stopforResume();
 
@@ -56,8 +58,6 @@ signals:
     void QDTexception( QString msg );
     void progressUpdate( int totalProgress, int level, int levelProgress );
 
-protected:
-    void run();
 
 private:
     enum workstate {ready, busy};
