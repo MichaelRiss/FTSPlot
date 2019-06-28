@@ -44,9 +44,9 @@ void preprocess(int argc, char *argv[]) {
         if (isnt_config_file(argv[i])) {
             QString str(argv[i]);
             ftsPrep.setNewFile(str);
+            ftsPrep.run();
         }
     }
-    ftsPrep.run();
 
 }
 
