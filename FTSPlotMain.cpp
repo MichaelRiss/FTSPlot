@@ -60,10 +60,10 @@ int main(int argc, char *argv[]) {
 
     MainWindow *mainwidget = new MainWindow();
 
-    if (argc) {
+    if (argc > 1) {
         preprocess(argc, argv);
         unsigned i;
-        for (i = 0; i < argc; i++) {
+        for (i = 1; i < argc; i++) {
             QString str(argv[i]);
             if (isnt_config_file(argv[i])) {
                 str.append(".cfg");
