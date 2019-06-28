@@ -26,7 +26,7 @@
 
 using namespace FTSPlot;
 
-class MainWindow : public QMainWindow, private Ui::MainWindow
+class MainWindow : public QMainWindow, public Ui::MainWindow
 {
     Q_OBJECT
 public:

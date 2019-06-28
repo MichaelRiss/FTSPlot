@@ -19,26 +19,58 @@
 #include <QTextStream>
 #include <QCoreApplication>
 #include "mainwindow.h"
+#include "FTSPrep.h"
 #include <iostream>
 #include <QtDebug>
 
 #ifdef Q_WS_X11
+
 #include <X11/Xlib.h>
+
 #endif
 
 
 using namespace std;
 
-int main ( int argc, char *argv[] )
-{
+bool isnt_config_file(char *filename) {
+    unsigned length = strlen(filename);
+    return strcmp(filename + (length - 4), ".cfg");
+}
+
+void preprocess(int argc, char *argv[]) {
+    FTSPrep ftsPrep;
+
+    for (unsigned i = 1; i < argc; i++) {
+        if (isnt_config_file(argv[i])) {
+            QString str(argv[i]);
+            ftsPrep.setNewFile(str);
+            ftsPrep.run();
+        }
+    }
+
+}
+
+int main(int argc, char *argv[]) {
 #ifdef Q_WS_X11
     XInitThreads();
 #endif
 
-    QApplication app ( argc, argv );
+    QApplication app(argc, argv);
 
 
-    MainWindow* mainwidget = new MainWindow();
+    MainWindow *mainwidget = new MainWindow();
+
+    if (argc > 1) {
+        preprocess(argc, argv);
+        unsigned i;
+        for (i = 1; i < argc; i++) {
+            QString str(argv[i]);
+            if (isnt_config_file(argv[i])) {
+                str.append(".cfg");
+            }
+            mainwidget->MySimpleViewWidget->addTimeSeries(str);
+        }
+    }
 
     mainwidget->show();
     return app.exec();
